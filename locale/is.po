@@ -819,7 +819,7 @@ msgstr "Hvernig bjó ég til og sameinaði Git greinar?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 15
 #: NEEDS WORK
 msgid "How do I generate and use SSH keys?"
-msgstr "Hvernig býr ég til og notar SSH lykla?"
+msgstr "Hvernig bjó ég til og notaði SSH lykla?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 16
 #: NEEDS WORK
@@ -3243,7 +3243,7 @@ msgstr "Merki óþekkt skipanir"
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 108
 #: NEEDS WORK
 msgid "Underline commands in red if they are not found in $PATH or shell builtins."
-msgstr "Undir línur skipanir í rauðu ef þær finnast ekki í $PATH eða shell innbyggðum."
+msgstr "Undir línur í rauðu ef þær finnast ekki í $PATH eða shell innbyggðum."
 # File: src/ashyterm/ui/dialogs/highlight_dialog.py, line: 2179
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/highlight/highlight_dialog.py:924
 msgid "Auto detects background, Manual uses selected theme"
@@ -4651,7 +4651,7 @@ msgstr "GitHub persónuheimildarmerki"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 223
 #: NEEDS WORK
 msgid "Search and select from available GitHub models."
-msgstr "Leitaðu og veldu úr tiltækum GitHub módnum."
+msgstr "Leitaðu og veldu úr tiltækum GitHub líkum."
 # 
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 227
 #: NEEDS WORK
@@ -4661,7 +4661,7 @@ msgstr "Mistral API lykill"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 230
 #: NEEDS WORK
 msgid "Search and select from available Mistral models."
-msgstr "Leitaðu og veldu úr tiltækum Mistral módum."
+msgstr "Leitaðu og veldu úr tiltækum Mistral líkum."
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 244
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/ai_config_dialog.py:236
 msgid "Model Name"
@@ -4742,8 +4742,8 @@ msgstr "Sýni fyrstu 100 niðurstöðurnar. Fínstilltu leitina þína til að s
 #: NEEDS WORK
 msgid "Free model — some providers may log or train on prompts. Check OpenRouter privacy settings."
 msgstr ""
-"Ókeypis líkan — sumir veitir kunna að skrá eða þjálfa á fyrirmælum. Athugaðu "
-"persónuverndarstillingar OpenRouter."
+"Ókeypis líkan — sumir veitir kunna skrá eða þjálfa á fyrirmælum. Athugaðu persónuverndarstillingar "
+"OpenRouter."
 # File: usr/share/ashyterm/ui/dialogs.py, line: 581
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/session_edit_dialog.py:126
 #. Test connection button (to the left of Save, only for SSH)

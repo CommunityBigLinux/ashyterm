@@ -840,7 +840,7 @@ msgstr "Come posso installare o aggiornare i pacchetti?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 18
 #: NEEDS WORK
 msgid "How do I schedule tasks with cron?"
-msgstr "Come posso pianificare attività con cron?"
+msgstr "Come posso programmare attività con cron?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 19
 #: NEEDS WORK
@@ -860,7 +860,7 @@ msgstr "Come gestisco gli ambienti virtuali Python?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 22
 #: NEEDS WORK
 msgid "How do I set environment variables?"
-msgstr "Come posso impostare le variabili di ambiente?"
+msgstr "Come faccio a impostare le variabili di ambiente?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/message_bubble.py, line: 48
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/widgets/ai_chat/message_bubble.py:48

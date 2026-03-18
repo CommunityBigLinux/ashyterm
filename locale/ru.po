@@ -3241,7 +3241,7 @@ msgstr ""
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 106
 #: NEEDS WORK
 msgid "Highlight Unknown Commands"
-msgstr "Выделить неизвестные команды"
+msgstr "Выделить Неизвестные Команды"
 # 
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 108
 #: NEEDS WORK
@@ -5459,8 +5459,8 @@ msgid ""
 "Tip: check your privacy settings at https://openrouter.ai/settings/privacy — some providers require "
 "enabling free endpoints or allowing data collection."
 msgstr ""
-"Совет: проверьте настройки конфиденциальности по адресу https://openrouter.ai/settings/privacy — "
-"некоторые провайдеры требуют включения бесплатных конечных точек или разрешения на сбор данных."
+"Совет: проверьте настройки конфиденциальности на https://openrouter.ai/settings/privacy — некоторые "
+"провайдеры требуют включения бесплатных конечных точек или разрешения на сбор данных."
 # File: src/ashyterm/terminal/manager.py, line: 1557
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/terminal/ssh_lifecycle.py:492
 msgid "Cancelled by user."

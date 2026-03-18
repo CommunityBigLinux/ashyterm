@@ -825,7 +825,7 @@ msgstr "Dockerコンテナをどのように管理しますか？"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 17
 #: NEEDS WORK
 msgid "How do I install or update packages?"
-msgstr "パッケージをインストールまたは更新するにはどうすればよいですか？"
+msgstr "パッケージをどのようにインストールまたは更新しますか？"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 18
 #: NEEDS WORK
@@ -4717,7 +4717,7 @@ msgstr "最初の100件の結果を表示しています。さらに表示する
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 682
 #: NEEDS WORK
 msgid "Free model — some providers may log or train on prompts. Check OpenRouter privacy settings."
-msgstr "無料モデル — 一部のプロバイダーはプロンプトをログまたはトレーニングする場合があります。OpenRouterのプライバシー設定を確認してください。"
+msgstr "無料モデル — 一部のプロバイダーはプロンプトをログに記録したり、トレーニングに使用したりする場合があります。OpenRouterのプライバシー設定を確認してください。"
 # File: usr/share/ashyterm/ui/dialogs.py, line: 581
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/session_edit_dialog.py:126
 #. Test connection button (to the left of Save, only for SSH)
@@ -5431,7 +5431,7 @@ msgid ""
 "enabling free endpoints or allowing data collection."
 msgstr ""
 "ヒント: https://openrouter.ai/settings/privacy でプライバシー設定を確認してください — "
-"一部のプロバイダーは、無料エンドポイントの有効化またはデータ収集の許可を必要とします。"
+"一部のプロバイダーは、無料エンドポイントの有効化やデータ収集の許可を必要とします。"
 # File: src/ashyterm/terminal/manager.py, line: 1557
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/terminal/ssh_lifecycle.py:492
 msgid "Cancelled by user."

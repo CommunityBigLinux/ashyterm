@@ -825,7 +825,7 @@ msgstr "Kuidas ma haldan Docker konteinerite?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 17
 #: NEEDS WORK
 msgid "How do I install or update packages?"
-msgstr "Kuidas ma installin või uuendan pakette?"
+msgstr "Kuidas ma paigaldan või uuendan pakette?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 18
 #: NEEDS WORK
@@ -3239,7 +3239,7 @@ msgstr "Tõsta esile tundmatud käsud"
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 108
 #: NEEDS WORK
 msgid "Underline commands in red if they are not found in $PATH or shell builtins."
-msgstr "Alusta käsud punasega, kui neid ei leita $PATH-ist või shelli sisseehitatud käskudest."
+msgstr "Alusta käsud punasega, kui neid ei leita $PATH-st või shelli sisseehitatud käskudest."
 # File: src/ashyterm/ui/dialogs/highlight_dialog.py, line: 2179
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/highlight/highlight_dialog.py:924
 msgid "Auto detects background, Manual uses selected theme"
@@ -4644,7 +4644,7 @@ msgstr "Otsi ja vali saadaval olevad Cerebras mudelid."
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 220
 #: NEEDS WORK
 msgid "GitHub Personal Access Token"
-msgstr "GitHubi isiklik juurdepääsutoken"
+msgstr "GitHubi isiklik juurdepääsuvõti"
 # 
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 223
 #: NEEDS WORK

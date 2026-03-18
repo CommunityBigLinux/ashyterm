@@ -815,7 +815,7 @@ msgstr "Git 브랜치를 어떻게 생성하고 병합하나요?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 15
 #: NEEDS WORK
 msgid "How do I generate and use SSH keys?"
-msgstr "SSH 키를 생성하고 사용하는 방법은 무엇인가요?"
+msgstr "SSH 키를 어떻게 생성하고 사용하나요?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 16
 #: NEEDS WORK
@@ -4632,7 +4632,7 @@ msgstr "GitHub 개인 액세스 토큰"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 223
 #: NEEDS WORK
 msgid "Search and select from available GitHub models."
-msgstr "사용 가능한 GitHub 모델에서 검색하고 선택하세요."
+msgstr "사용 가능한 GitHub 모델에서 검색하고 선택하십시오."
 # 
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 227
 #: NEEDS WORK

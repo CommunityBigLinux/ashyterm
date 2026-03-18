@@ -829,7 +829,7 @@ msgstr "Kako upravljam Docker kontejnerima?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 17
 #: NEEDS WORK
 msgid "How do I install or update packages?"
-msgstr "Kako mogu instalirati ili ažurirati pakete?"
+msgstr "Kako instalirati ili ažurirati pakete?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 18
 #: NEEDS WORK
@@ -3244,7 +3244,7 @@ msgstr "Istakni nepoznate naredbe"
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 108
 #: NEEDS WORK
 msgid "Underline commands in red if they are not found in $PATH or shell builtins."
-msgstr "Podcrtaj naredbe u crveno ako nisu pronađene u $PATH ili ugrađenim naredbama ljuske."
+msgstr "Podcrtaj naredbe crvenom ako nisu pronađene u $PATH ili ugrađenim ljuskom."
 # File: src/ashyterm/ui/dialogs/highlight_dialog.py, line: 2179
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/highlight/highlight_dialog.py:924
 msgid "Auto detects background, Manual uses selected theme"
@@ -4642,7 +4642,7 @@ msgstr "Cerebras API ključ"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 216
 #: NEEDS WORK
 msgid "Search and select from available Cerebras models."
-msgstr "Pretraži i odaberi dostupne Cerebras modele."
+msgstr "Pretražite i odaberite dostupne Cerebras modele."
 # 
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 220
 #: NEEDS WORK
@@ -4743,8 +4743,8 @@ msgstr "Prikazano prvih 100 rezultata. Pročistite pretragu kako biste vidjeli v
 #: NEEDS WORK
 msgid "Free model — some providers may log or train on prompts. Check OpenRouter privacy settings."
 msgstr ""
-"Besplatan model — neki pružatelji mogu bilježiti ili trenirati na upitima. Provjerite postavke "
-"privatnosti OpenRouter-a."
+"Besplatni model — neki pružatelji mogu bilježiti ili trenirati na upitima. Provjerite postavke "
+"privatnosti OpenRoutera."
 # File: usr/share/ashyterm/ui/dialogs.py, line: 581
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/session_edit_dialog.py:126
 #. Test connection button (to the left of Save, only for SSH)

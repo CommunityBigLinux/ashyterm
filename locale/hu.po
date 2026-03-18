@@ -847,7 +847,7 @@ msgstr "Hogyan ütemezhetek feladatokat a cron segítségével?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 19
 #: NEEDS WORK
 msgid "How do I search and replace text in files?"
-msgstr "Hogyan kereshetek és cserélhetek le szöveget fájlokban?"
+msgstr "Hogyan kereshetek és cserélhetek szöveget a fájlokban?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 20
 #: NEEDS WORK

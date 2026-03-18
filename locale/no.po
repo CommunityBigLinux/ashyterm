@@ -4756,7 +4756,7 @@ msgstr "Viser de første 100 resultatene. Avgrens søket for å se mer."
 #: NEEDS WORK
 msgid "Free model — some providers may log or train on prompts. Check OpenRouter privacy settings."
 msgstr ""
-"Gratis modell — noen leverandører kan loggføre eller trene på forespørslene. Sjekk OpenRouter "
+"Gratis modell — noen leverandører kan logge eller trene på forespørslene. Sjekk OpenRouter "
 "personverninnstillinger."
 # File: usr/share/ashyterm/ui/dialogs.py, line: 581
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/session_edit_dialog.py:126

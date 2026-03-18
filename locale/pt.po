@@ -946,7 +946,7 @@ msgstr "Como alterar as permissões de arquivo?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 14
 #: NEEDS WORK
 msgid "How do I create and merge Git branches?"
-msgstr "Como faço para criar e mesclar branches do Git?"
+msgstr "Como crio e mesclo branches do Git?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 15
 #: NEEDS WORK
@@ -981,12 +981,12 @@ msgstr "Como eu uso pipes e redirecionamentos?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 21
 #: NEEDS WORK
 msgid "How do I manage Python virtual environments?"
-msgstr "Como faço para gerenciar ambientes virtuais Python?"
+msgstr "Como gerencio ambientes virtuais do Python?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 22
 #: NEEDS WORK
 msgid "How do I set environment variables?"
-msgstr "Como defino variáveis de ambiente?"
+msgstr "Como faço para definir variáveis de ambiente?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/message_bubble.py, line: 48
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/widgets/ai_chat/message_bubble.py:48

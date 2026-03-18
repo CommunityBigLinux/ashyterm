@@ -811,7 +811,7 @@ msgstr "Cum pot găsi fișiere după nume sau conținut?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 12
 #: NEEDS WORK
 msgid "How do I check disk, CPU, or memory usage?"
-msgstr "Cum verific utilizarea discului, a CPU-ului sau a memoriei?"
+msgstr "Cum verific utilizarea discului, CPU-ului sau memoriei?"
 # File: src/ashyterm/ui/widgets/ai_chat_panel.py, line: 224
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/widgets/ai_chat/_prompts.py:17
 msgid "How do I change file permissions?"
@@ -820,7 +820,7 @@ msgstr "Cum pot schimba permisiunile fișierului?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 14
 #: NEEDS WORK
 msgid "How do I create and merge Git branches?"
-msgstr "Cum pot crea și îmbina ramuri Git?"
+msgstr "Cum creez și îmbin ramuri Git?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 15
 #: NEEDS WORK
@@ -845,7 +845,7 @@ msgstr "Cum îmi programez sarcinile cu cron?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 19
 #: NEEDS WORK
 msgid "How do I search and replace text in files?"
-msgstr "Cum caut și înlocuiesc textul în fișiere?"
+msgstr "Cum pot căuta și înlocui text în fișiere?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 20
 #: NEEDS WORK
@@ -3256,12 +3256,14 @@ msgstr ""
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 106
 #: NEEDS WORK
 msgid "Highlight Unknown Commands"
-msgstr "Evidențiază Comenzi Necunoscute"
+msgstr "Evidențiază Comenzile Necunoscute"
 # 
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 108
 #: NEEDS WORK
 msgid "Underline commands in red if they are not found in $PATH or shell builtins."
-msgstr "Subliniază comenzile cu roșu dacă nu sunt găsite în $PATH sau în comenzi încorporate."
+msgstr ""
+"Subliniază comenzile cu roșu dacă nu sunt găsite în $PATH sau în comenzile încorporate ale "
+"shell-ului."
 # File: src/ashyterm/ui/dialogs/highlight_dialog.py, line: 2179
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/highlight/highlight_dialog.py:924
 msgid "Auto detects background, Manual uses selected theme"

@@ -4753,7 +4753,7 @@ msgstr "Δείξτε μόνο δωρεάν μοντέλα."
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 414
 #: NEEDS WORK
 msgid "Show only free models"
-msgstr "Εμφάνιση μόνο δωρεάν μοντέλων"
+msgstr "Δείξτε μόνο δωρεάν μοντέλα"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 358
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/ai_config_dialog.py:419
 msgid "Loading models..."
@@ -4787,8 +4787,8 @@ msgstr "Εμφάνιση πρώτων 100 αποτελεσμάτων. Εξευγ
 #: NEEDS WORK
 msgid "Free model — some providers may log or train on prompts. Check OpenRouter privacy settings."
 msgstr ""
-"Δωρεάν μοντέλο — ορισμένοι πάροχοι ενδέχεται να καταγράφουν ή να εκπαιδεύουν με βάση τις προτροπές. "
-"Ελέγξτε τις ρυθμίσεις απορρήτου του OpenRouter."
+"Δωρεάν μοντέλο — ορισμένοι πάροχοι ενδέχεται να καταγράφουν ή να εκπαιδεύονται με βάση τις "
+"προτροπές. Ελέγξτε τις ρυθμίσεις απορρήτου του OpenRouter."
 # File: usr/share/ashyterm/ui/dialogs.py, line: 581
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/session_edit_dialog.py:126
 #. Test connection button (to the left of Save, only for SSH)

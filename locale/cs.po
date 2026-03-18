@@ -805,7 +805,7 @@ msgstr "Jak mohu najít soubory podle názvu nebo obsahu?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 12
 #: NEEDS WORK
 msgid "How do I check disk, CPU, or memory usage?"
-msgstr "Jak zkontroluji využití disku, CPU nebo paměti?"
+msgstr "Jak mohu zkontrolovat využití disku, CPU nebo paměti?"
 # File: src/ashyterm/ui/widgets/ai_chat_panel.py, line: 224
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/widgets/ai_chat/_prompts.py:17
 msgid "How do I change file permissions?"
@@ -856,7 +856,7 @@ msgstr "Jak spravovat virtuální prostředí Pythonu?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 22
 #: NEEDS WORK
 msgid "How do I set environment variables?"
-msgstr "Jak mohu nastavit proměnné prostředí?"
+msgstr "Jak nastavím proměnné prostředí?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/message_bubble.py, line: 48
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/widgets/ai_chat/message_bubble.py:48

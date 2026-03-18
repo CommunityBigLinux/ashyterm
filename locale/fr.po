@@ -852,7 +852,7 @@ msgstr "Comment puis-je rechercher et remplacer du texte dans des fichiers ?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 20
 #: NEEDS WORK
 msgid "How do I use pipes and redirections?"
-msgstr "Comment utiliser les tuyaux et les redirections ?"
+msgstr "Comment puis-je utiliser des tuyaux et des redirections ?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 21
 #: NEEDS WORK
@@ -3274,8 +3274,8 @@ msgstr "Mettre en surbrillance les commandes inconnues"
 #: NEEDS WORK
 msgid "Underline commands in red if they are not found in $PATH or shell builtins."
 msgstr ""
-"Soulignez les commandes en rouge si elles ne sont pas trouvées dans $PATH ou dans les commandes "
-"internes du shell."
+"Soulignez les commandes en rouge si elles ne sont pas trouvées dans $PATH ou les commandes internes "
+"du shell."
 # File: src/ashyterm/ui/dialogs/highlight_dialog.py, line: 2179
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/highlight/highlight_dialog.py:924
 msgid "Auto detects background, Manual uses selected theme"
@@ -4784,8 +4784,8 @@ msgstr "Affichage des 100 premiers résultats. Affinez votre recherche pour en v
 #: NEEDS WORK
 msgid "Free model — some providers may log or train on prompts. Check OpenRouter privacy settings."
 msgstr ""
-"Modèle gratuit — certains fournisseurs peuvent enregistrer ou s'entraîner sur les invites. Vérifiez "
-"les paramètres de confidentialité d'OpenRouter."
+"Modèle gratuit — certains fournisseurs peuvent enregistrer ou entraîner des invites. Vérifiez les "
+"paramètres de confidentialité d'OpenRouter."
 # File: usr/share/ashyterm/ui/dialogs.py, line: 581
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/session_edit_dialog.py:126
 #. Test connection button (to the left of Save, only for SSH)

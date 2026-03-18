@@ -817,7 +817,7 @@ msgstr "Як створити та об'єднати гілки Git?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 15
 #: NEEDS WORK
 msgid "How do I generate and use SSH keys?"
-msgstr "How do I generate and use SSH keys?"
+msgstr "Як я можу згенерувати та використовувати SSH-ключі?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 16
 #: NEEDS WORK
@@ -827,12 +827,12 @@ msgstr "Як я можу керувати контейнерами Docker?"
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 17
 #: NEEDS WORK
 msgid "How do I install or update packages?"
-msgstr "Як я можу встановити або оновити пакунки?"
+msgstr "How do I install or update packages?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 18
 #: NEEDS WORK
 msgid "How do I schedule tasks with cron?"
-msgstr "How do I schedule tasks with cron?"
+msgstr "Як я можу запланувати завдання за допомогою cron?"
 # 
 # File: src/ashyterm/ui/widgets/ai_chat/_prompts.py, line: 19
 #: NEEDS WORK
@@ -3240,7 +3240,7 @@ msgstr "Виділити невідомі команди"
 # File: src/ashyterm/ui/dialogs/highlight/shell_input_delegate.py, line: 108
 #: NEEDS WORK
 msgid "Underline commands in red if they are not found in $PATH or shell builtins."
-msgstr "Substitute commands in red if they are not found in $PATH or shell builtins."
+msgstr "Underline commands in red if they are not found in $PATH or shell builtins."
 # File: src/ashyterm/ui/dialogs/highlight_dialog.py, line: 2179
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/highlight/highlight_dialog.py:924
 msgid "Auto detects background, Manual uses selected theme"
@@ -4636,7 +4636,7 @@ msgstr "Cerebras API Key"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 216
 #: NEEDS WORK
 msgid "Search and select from available Cerebras models."
-msgstr "Search and select from available Cerebras models."
+msgstr "Пошук та вибір з доступних моделей Cerebras."
 # 
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 220
 #: NEEDS WORK
@@ -4646,7 +4646,7 @@ msgstr "GitHub Персональний токен доступу"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 223
 #: NEEDS WORK
 msgid "Search and select from available GitHub models."
-msgstr "Пошук та вибір з доступних моделей GitHub."
+msgstr "Шукати та вибирати з доступних моделей GitHub."
 # 
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 227
 #: NEEDS WORK
@@ -4656,7 +4656,7 @@ msgstr "Mistral API Key"
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 230
 #: NEEDS WORK
 msgid "Search and select from available Mistral models."
-msgstr "Пошук та вибір з доступних моделей Mistral."
+msgstr "Шукати та вибирати з доступних моделей Mistral."
 # File: src/ashyterm/ui/dialogs/ai_config_dialog.py, line: 245
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/ui/dialogs/ai_config_dialog.py:236
 msgid "Model Name"
@@ -5451,8 +5451,8 @@ msgid ""
 "Tip: check your privacy settings at https://openrouter.ai/settings/privacy — some providers require "
 "enabling free endpoints or allowing data collection."
 msgstr ""
-"Tip: проверьте настройки конфиденциальности на https://openrouter.ai/settings/privacy — некоторые "
-"провайдеры требуют включения бесплатных конечных точек или разрешения на сбор данных."
+"Tip: check your privacy settings at https://openrouter.ai/settings/privacy — some providers require "
+"enabling free endpoints or allowing data collection."
 # File: src/ashyterm/terminal/manager.py, line: 1557
 #: /home/talesam/Servidor/GitHub/BigCommunity/ashyterm/src/ashyterm/terminal/ssh_lifecycle.py:492
 msgid "Cancelled by user."
