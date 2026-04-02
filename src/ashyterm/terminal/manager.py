@@ -98,6 +98,13 @@ class TerminalManager(SSHLifecycleMixin, URLHandlerMixin):
         )
         self.logger.info("Terminal manager initialized")
 
+    def _ensure_process_check_timer(self) -> None:
+        """Re-arm the periodic process check timer if it was stopped."""
+        if self._process_check_timer_id is None:
+            self._process_check_timer_id = GLib.timeout_add_seconds(
+                3, self._periodic_process_check
+            )
+
     def prepare_initial_terminal(self) -> None:
         """
         Pre-create the base terminal widget and prepare shell environment in background.
@@ -240,6 +247,11 @@ class TerminalManager(SSHLifecycleMixin, URLHandlerMixin):
         Note: Context-aware highlighting is now handled by CommandDetector
         which parses the terminal output stream in real-time.
         """
+        # Stop timer if no terminals are registered
+        if not self.registry.get_all_terminal_ids():
+            self._process_check_timer_id = None
+            return False
+
         try:
             if self.parent_window and hasattr(self.parent_window, "tab_manager"):
                 active_terminal = self.parent_window.tab_manager.get_selected_terminal()
@@ -470,6 +482,7 @@ class TerminalManager(SSHLifecycleMixin, URLHandlerMixin):
         identifier = session if session else title
         terminal_id = self.registry.register_terminal(terminal, "local", identifier)
         self._setup_terminal_events(terminal, identifier, terminal_id)
+        self._ensure_process_check_timer()
 
         try:
             resolved_working_dir = self._resolve_working_directory(working_directory)
@@ -651,6 +664,7 @@ class TerminalManager(SSHLifecycleMixin, URLHandlerMixin):
 
         terminal_id = self.registry.register_terminal(terminal, terminal_type, session)
         self._setup_terminal_events(terminal, session, terminal_id)
+        self._ensure_process_check_timer()
         return terminal, terminal_id
 
     def _spawn_ssh_terminal(

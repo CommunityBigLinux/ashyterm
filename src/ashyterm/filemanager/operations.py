@@ -81,6 +81,7 @@ class FileOperations:
             str, dict[str, tuple[bool, float]]
         ] = {}  # {session_key: {command: (available, timestamp)}}
         self._cache_ttl = 300  # 5 minutes
+        self._max_cache_sessions = 50  # Max number of sessions in cache
         self._active_processes: dict[str, Any] = {}
         self._lock = threading.Lock()
 
@@ -135,6 +136,17 @@ class FileOperations:
         )
 
         if session_key not in self._command_cache:
+            # Evict oldest sessions if cache exceeds size limit
+            if len(self._command_cache) >= self._max_cache_sessions:
+                oldest_key = min(
+                    self._command_cache,
+                    key=lambda k: (
+                        max(ts for _, ts in self._command_cache[k].values())
+                        if self._command_cache[k]
+                        else 0
+                    ),
+                )
+                del self._command_cache[oldest_key]
             self._command_cache[session_key] = {}
         self._command_cache[session_key][command] = (success, time.monotonic())
         return success

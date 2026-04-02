@@ -151,7 +151,10 @@ class SettingsManager:
         self._dirty = False
         self._was_repaired = False
         self._lock = threading.RLock()
-        self._change_listeners: List[Callable[[str, Any, Any], None]] = []
+        # Use WeakMethod/weakref to avoid preventing listener owners from being GC'd.
+        # Each entry is (weakref, original_callable) so we can match on the original
+        # when removing.  WeakMethod is used for bound methods; plain weakref for others.
+        self._change_listeners: List[weakref.ref] = []
         self.custom_schemes: Dict[str, Any] = {}
         # Unified CSS provider for the entire application
         self._app_css_provider = Gtk.CssProvider()
@@ -508,20 +511,37 @@ class SettingsManager:
             raise ConfigValidationError(key, value, "Invalid keyboard shortcut")
 
     def _notify_change_listeners(self, key: str, old_value: Any, new_value: Any):
-        for listener in self._change_listeners:
+        dead: list[weakref.ref] = []
+        for ref in self._change_listeners:
+            listener = ref()
+            if listener is None:
+                dead.append(ref)
+                continue
             try:
                 listener(key, old_value, new_value)
             except Exception as e:
                 self.logger.error(f"Change listener failed for key '{key}': {e}")
+        # Prune collected (dead) weak references
+        for ref in dead:
+            self._change_listeners.remove(ref)
 
     def add_change_listener(self, listener: Callable[[str, Any, Any], None]):
-        if listener not in self._change_listeners:
-            self._change_listeners.append(listener)
+        # Use WeakMethod for bound methods so listener is released when owner is GC'd
+        if hasattr(listener, "__self__"):
+            ref = weakref.WeakMethod(listener)
+        else:
+            ref = weakref.ref(listener)
+        # Avoid duplicate registrations
+        for existing in self._change_listeners:
+            if existing() is listener:
+                return
+        self._change_listeners.append(ref)
 
     def remove_change_listener(self, listener: Callable[[str, Any, Any], None]):
         """Remove a previously added change listener."""
-        if listener in self._change_listeners:
-            self._change_listeners.remove(listener)
+        for ref in list(self._change_listeners):
+            if ref() is listener or ref() is None:
+                self._change_listeners.remove(ref)
 
     def get_all_schemes(self) -> Dict[str, Any]:
         """Merges built-in schemes with custom schemes."""

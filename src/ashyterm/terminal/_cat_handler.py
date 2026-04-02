@@ -155,7 +155,7 @@ class CatModeHandler:
         if not hasattr(self, "_cat_queue"):
             from collections import deque
 
-            self._cat_queue: deque = deque()
+            self._cat_queue: deque = deque(maxlen=2000)
             self._cat_queue_processing = False
 
     def _process_cat_lines(self, text: str) -> None:

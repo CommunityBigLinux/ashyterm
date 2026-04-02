@@ -154,16 +154,26 @@ class SessionTreeView:
 
         # Subscribe to AppSignals for decoupled updates
         signals = AppSignals.get()
-        signals.connect("session-created", self._on_session_signal)
-        signals.connect("session-updated", self._on_session_signal)
-        signals.connect("session-deleted", self._on_session_signal)
-        signals.connect("folder-created", self._on_folder_signal)
-        signals.connect("folder-updated", self._on_folder_signal)
-        signals.connect("folder-deleted", self._on_folder_signal)
-        signals.connect("request-tree-refresh", self._on_request_tree_refresh)
+        self._signal_handler_ids = [
+            signals.connect("session-created", self._on_session_signal),
+            signals.connect("session-updated", self._on_session_signal),
+            signals.connect("session-deleted", self._on_session_signal),
+            signals.connect("folder-created", self._on_folder_signal),
+            signals.connect("folder-updated", self._on_folder_signal),
+            signals.connect("folder-deleted", self._on_folder_signal),
+            signals.connect("request-tree-refresh", self._on_request_tree_refresh),
+        ]
 
         self.refresh_tree()
         self.logger.info("SessionTreeView (ColumnView) initialized")
+
+    def disconnect_signals(self) -> None:
+        """Disconnect AppSignals handlers to allow garbage collection."""
+        signals = AppSignals.get()
+        for handler_id in self._signal_handler_ids:
+            if GObject.signal_handler_is_connected(signals, handler_id):
+                signals.disconnect(handler_id)
+        self._signal_handler_ids.clear()
 
     def _filter_func(self, item: GObject.GObject) -> bool:
         """Filter function that determines if an item should be visible."""

@@ -318,7 +318,7 @@ class DefaultSettings:
             "cursor_shape": 0,
             "bidi_enabled": False,
             "enable_shaping": False,  # For Arabic text shaping
-            "sixel_enabled": True,
+            "sixel_enabled": False,
             "text_blink_mode": 0,
             "accessibility_enabled": True,
             # Compatibility & Advanced

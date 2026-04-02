@@ -23,8 +23,8 @@ class AIHistoryManager:
         self._history_file = self._config_paths.CONFIG_DIR / "ai_history.json"
         self._conversations: List[Dict[str, Any]] = []
         self._current_conversation_id: Optional[str] = None
-        self._max_conversations = 100  # Limit number of conversations
-        self._max_messages_per_conversation = 200  # Limit messages per conversation
+        self._max_conversations = 50  # Limit number of conversations
+        self._max_messages_per_conversation = 100  # Limit messages per conversation
         self._load_history()
 
     def _load_history(self) -> None:
@@ -123,6 +123,9 @@ class AIHistoryManager:
         conv = {"id": conv_id, "created_at": datetime.now().isoformat(), "messages": []}
         self._conversations.append(conv)
         self._current_conversation_id = conv_id
+        # Enforce in-memory limit on number of conversations
+        if len(self._conversations) > self._max_conversations:
+            self._conversations = self._conversations[-self._max_conversations :]
         self._save_history()
         self.logger.info(f"Created new conversation: {conv_id}")
         return conv
@@ -170,6 +173,11 @@ class AIHistoryManager:
             entry["commands"] = commands
 
         conv["messages"].append(entry)
+
+        # Enforce in-memory limits (not just on save)
+        if len(conv["messages"]) > self._max_messages_per_conversation:
+            conv["messages"] = conv["messages"][-self._max_messages_per_conversation :]
+
         self._save_history()
 
     def add_user_message(self, content: str) -> None:

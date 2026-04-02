@@ -292,7 +292,7 @@ class PreferencesDialog(Adw.PreferencesWindow):
         scrolling_group = Adw.PreferencesGroup()
         page.add(scrolling_group)
 
-        scrollback_spin = Adw.SpinRow.new_with_range(0, 1000000, 1000)
+        scrollback_spin = Adw.SpinRow.new_with_range(0, 100000, 1000)
         scrollback_spin.set_title(_("History Limit"))
         scrollback_spin.set_subtitle(_("0 for unlimited"))
         scrollback_spin.set_value(self.settings_manager.get("scrollback_lines", 10000))

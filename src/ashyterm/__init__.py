@@ -1,5 +1,3 @@
-import argparse
-
 import signal
 import sys
 
@@ -60,29 +58,36 @@ def setup_signal_handlers():
 
 def main() -> int:
     """Main entry point for the application."""
-    # Ensure accent/diacritics work on Wayland without IBUS/FCITX.
-    # Must run before any GTK import.
-    from .utils.platform import ensure_wayland_input_method
+    import os
 
-    ensure_wayland_input_method()
+    # Ensure accent/diacritics work on Wayland without IBUS/FCITX.
+    # Must run before any GTK import. Inlined here to avoid importing
+    # the heavy utils.platform module at this stage.
+    if (
+        os.environ.get("XDG_SESSION_TYPE", "").lower() == "wayland"
+        and not os.environ.get("GTK_IM_MODULE")
+    ):
+        os.environ["GTK_IM_MODULE"] = "simple"
 
     logger_mod = _get_logger_funcs()
     _ = _get_translation()
 
-    # Use a separate parser to handle debug/log flags before the main app starts
-    pre_parser = argparse.ArgumentParser(add_help=False)
-    pre_parser.add_argument("--debug", "-d", action="store_true")
-    pre_parser.add_argument("--log-level")
-    pre_args, _unused_args = pre_parser.parse_known_args()
+    # Quick check for debug/log flags before the main app starts (no argparse needed)
+    pre_args_debug = "--debug" in sys.argv or "-d" in sys.argv
+    pre_args_log_level = None
+    for i, arg in enumerate(sys.argv[:-1]):
+        if arg == "--log-level" and i + 1 < len(sys.argv):
+            pre_args_log_level = sys.argv[i + 1]
+            break
 
     # Apply pre-launch log settings if provided
-    if pre_args.debug:
+    if pre_args_debug:
         logger_mod.enable_debug_mode()
-    elif pre_args.log_level:
+    elif pre_args_log_level:
         try:
-            logger_mod.set_console_log_level(pre_args.log_level)
+            logger_mod.set_console_log_level(pre_args_log_level)
         except KeyError:
-            print(f"Warning: Invalid log level '{pre_args.log_level}' provided.")
+            print(f"Warning: Invalid log level '{pre_args_log_level}' provided.")
 
     logger = logger_mod.get_logger("ashyterm.main")
 
@@ -95,77 +100,34 @@ def main() -> int:
     except Exception as e:
         logger.error(f"Failed to set process title: {e}", exc_info=True)
 
-    # Main parser for the application's command-line interface
-    parser = argparse.ArgumentParser(
-        prog="ashyterm",
-        description=_(
-            "Ashy Terminal - A modern terminal emulator with session management"
-        ),
-        epilog=_("For more information, visit: https://communitybig.org/"),
-    )
+    # Handle --version before loading GTK (fast path)
+    if "--version" in sys.argv or "-v" in sys.argv:
+        from .settings.config import APP_VERSION
 
-    # Custom version action to load APP_VERSION lazily (avoids loading GTK for --version)
-    class LazyVersionAction(argparse.Action):
-        def __call__(self, parser, _namespace, values, _option_string=None):
-            from .settings.config import APP_VERSION
+        print(f"ashyterm {APP_VERSION}")
+        return 0
 
-            print(f"ashyterm {APP_VERSION}")
-            parser.exit()
-
-    parser.add_argument(
-        "--version",
-        "-v",
-        nargs=0,
-        action=LazyVersionAction,
-        help=_("Show version and exit"),
-    )
-    parser.add_argument(
-        "--debug", "-d", action="store_true", help=_("Enable debug mode")
-    )
-    parser.add_argument(
-        "--log-level",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        help=_("Set logging level"),
-    )
-    parser.add_argument(
-        "--working-directory",
-        "-w",
-        metavar="DIR",
-        help=_("Set the working directory for the initial terminal"),
-    )
-    parser.add_argument(
-        "directory",
-        nargs="?",
-        default=None,
-        help=_("Working directory (positional argument)"),
-    )
-    parser.add_argument(
-        "--execute",
-        "-e",
-        "-x",
-        metavar="COMMAND",
-        nargs=argparse.REMAINDER,
-        help=_("Execute command in the terminal (takes all remaining arguments)"),
-    )
-    parser.add_argument(
-        "--close-after-execute",
-        action="store_true",
-        help=_("Close terminal after executing command (only with --execute)"),
-    )
-    parser.add_argument(
-        "--ssh",
-        metavar="[USER@]HOST[:PORT][:/PATH]",
-        help=_("Connect to SSH host with optional user, port, and remote path"),
-    )
-    parser.add_argument(
-        "--convert-to-ssh", help=_("Convert KIO/GVFS URI path to SSH format")
-    )
-    # NEW: Added the --new-window argument
-    parser.add_argument(
-        "--new-window", action="store_true", help=_("Force opening a new window")
-    )
-
-    parser.parse_known_args()
+    # Handle --help before loading GTK (fast path)
+    if "--help" in sys.argv or "-h" in sys.argv:
+        print(
+            "Usage: ashyterm [OPTIONS] [DIRECTORY]\n"
+            "\n"
+            "Ashy Terminal - A modern terminal emulator with session management\n"
+            "\n"
+            "Options:\n"
+            "  -h, --help                       Show this help message and exit\n"
+            "  -v, --version                    Show version and exit\n"
+            "  -d, --debug                      Enable debug mode\n"
+            "  --log-level LEVEL                Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)\n"
+            "  -w, --working-directory DIR      Set the working directory for the initial terminal\n"
+            "  -e, -x, --execute COMMAND ...    Execute command in the terminal\n"
+            "  --close-after-execute            Close terminal after executing command\n"
+            "  --ssh [USER@]HOST[:PORT][:/PATH] Connect to SSH host\n"
+            "  --new-window                     Force opening a new window\n"
+            "\n"
+            "For more information, visit: https://communitybig.org/"
+        )
+        return 0
 
     setup_signal_handlers()
 

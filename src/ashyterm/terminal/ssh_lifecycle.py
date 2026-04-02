@@ -804,6 +804,9 @@ class SSHLifecycleMixin:
         if terminal_id in self._pending_kill_timers:
             GLib.source_remove(self._pending_kill_timers.pop(terminal_id))
 
+        # Clean per-terminal tracking dicts to prevent memory leaks
+        self._command_start_times.pop(terminal_id, None)
+
     def _cleanup_terminal(self, terminal: Vte.Terminal, terminal_id: int) -> None:
         if self.is_auto_reconnect_active(terminal):
             self.logger.warning(

@@ -188,6 +188,7 @@ class TerminalAiAssistant(GObject.Object):
         self.settings_manager = settings_manager
         self.terminal_manager = terminal_manager
         self._conversations: Dict[int, List[Dict[str, str]]] = {}
+        self._max_conversation_messages = 40  # Keep last N messages per terminal
         self._terminal_refs: Dict[int, weakref.ReferenceType] = {}
         self._inflight: Dict[int, bool] = {}
         self._cancel_flags: Dict[int, bool] = {}
@@ -325,6 +326,12 @@ class TerminalAiAssistant(GObject.Object):
             self._conversations.clear()
             self._terminal_refs.clear()
             self._inflight.clear()
+            self._cancel_flags.clear()
+            self._active_responses.clear()
+
+    def shutdown(self) -> None:
+        """Clean up all state for window destruction."""
+        self.clear_all_conversations()
 
     def cancel_request(self, terminal_id: int = -1) -> None:
         """Cancel an inflight request for the given terminal."""
@@ -425,6 +432,9 @@ class TerminalAiAssistant(GObject.Object):
         with self._lock:
             history = self._conversations.setdefault(terminal_id, [])
             history.append({"role": "user", "content": prompt})
+            # Cap conversation length to prevent unbounded memory growth
+            if len(history) > self._max_conversation_messages:
+                history[:] = history[-self._max_conversation_messages :]
             messages: List[Dict[str, str]] = [
                 {"role": "system", "content": self._get_system_prompt()}
             ]
@@ -1235,6 +1245,9 @@ class TerminalAiAssistant(GObject.Object):
         with self._lock:
             history = self._conversations.setdefault(terminal_id, [])
             history.append({"role": "assistant", "content": message})
+            # Cap conversation length to prevent unbounded memory growth
+            if len(history) > self._max_conversation_messages:
+                history[:] = history[-self._max_conversation_messages :]
 
     def _display_assistant_reply(
         self,
@@ -1261,6 +1274,8 @@ class TerminalAiAssistant(GObject.Object):
         self._conversations.pop(terminal_id, None)
         self._terminal_refs.pop(terminal_id, None)
         self._inflight.pop(terminal_id, None)
+        self._cancel_flags.pop(terminal_id, None)
+        self._active_responses.pop(terminal_id, None)
 
     def _queue_toast(self, message: str) -> None:
         def _show_toast():

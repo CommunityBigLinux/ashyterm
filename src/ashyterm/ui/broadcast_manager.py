@@ -1,5 +1,6 @@
 # ashyterm/ui/broadcast_manager.py
-from typing import TYPE_CHECKING, List
+import weakref
+from typing import TYPE_CHECKING, List, Optional
 
 import gi
 
@@ -24,7 +25,7 @@ class BroadcastManager(GObject.Object):
 
     def __init__(self, window: "CommTerminalWindow"):
         super().__init__()
-        self.window = window
+        self._window_ref = weakref.ref(window)
         self.ui = window.ui_builder
         self.tab_manager = window.tab_manager
         self.logger = window.logger
@@ -34,6 +35,10 @@ class BroadcastManager(GObject.Object):
         self.last_selection: list[str] = []
 
         self._setup_connections()
+
+    @property
+    def window(self) -> Optional["CommTerminalWindow"]:
+        return self._window_ref()
 
     def _setup_connections(self):
         """Connect UI signals to manager methods."""
@@ -51,9 +56,13 @@ class BroadcastManager(GObject.Object):
     def _on_broadcast_mode_changed(self, broadcast_bar, _param):
         if broadcast_bar.get_search_mode():
             self.ui.broadcast_entry.grab_focus()
-            self.window.add_css_class("broadcast-active")
+            window = self.window
+            if window:
+                window.add_css_class("broadcast-active")
         else:
-            self.window.remove_css_class("broadcast-active")
+            window = self.window
+            if window:
+                window.remove_css_class("broadcast-active")
             if terminal := self.tab_manager.get_selected_terminal():
                 terminal.grab_focus()
 
@@ -71,24 +80,28 @@ class BroadcastManager(GObject.Object):
 
         MAX_BROADCAST_LENGTH = 10_000
         if len(command) > MAX_BROADCAST_LENGTH:
-            self.window.toast_overlay.add_toast(
-                Adw.Toast(
-                    title=_("Command too long (max {} characters).").format(
-                        MAX_BROADCAST_LENGTH
+            window = self.window
+            if window:
+                window.toast_overlay.add_toast(
+                    Adw.Toast(
+                        title=_("Command too long (max {} characters).").format(
+                            MAX_BROADCAST_LENGTH
+                        )
                     )
                 )
-            )
             return
 
         all_terminals = self.tab_manager.get_all_terminals_across_tabs()
         if not all_terminals:
-            self.window.toast_overlay.add_toast(
-                Adw.Toast(
-                    title=_(
-                        "Cannot broadcast: no terminals are open. Open at least one terminal first."
+            window = self.window
+            if window:
+                window.toast_overlay.add_toast(
+                    Adw.Toast(
+                        title=_(
+                            "Cannot broadcast: no terminals are open. Open at least one terminal first."
+                        )
                     )
                 )
-            )
             return
 
         if self.remember_choice and self.last_selection:
@@ -196,7 +209,9 @@ class BroadcastManager(GObject.Object):
             selection_controls,
             remember_check,
         )
-        dialog.present(self.window)
+        window = self.window
+        if window:
+            dialog.present(window)
 
     def _on_dialog_response(
         self, dialog, response_id, command, controls, remember_check
@@ -210,9 +225,11 @@ class BroadcastManager(GObject.Object):
                 self.last_selection = []
 
             if not selected:
-                self.window.toast_overlay.add_toast(
-                    Adw.Toast(title=_("No tabs were selected."))
-                )
+                window = self.window
+                if window:
+                    window.toast_overlay.add_toast(
+                        Adw.Toast(title=_("No tabs were selected."))
+                    )
             else:
                 self.execute_broadcast(command, selected)
 
@@ -247,13 +264,15 @@ class BroadcastManager(GObject.Object):
         """Directly broadcast to all terminals (e.g. from Command Manager)."""
         all_terminals = self.tab_manager.get_all_terminals_across_tabs()
         if not all_terminals:
-            self.window.toast_overlay.add_toast(
-                Adw.Toast(
-                    title=_(
-                        "Cannot broadcast: no terminals are open. Open at least one terminal first."
+            window = self.window
+            if window:
+                window.toast_overlay.add_toast(
+                    Adw.Toast(
+                        title=_(
+                            "Cannot broadcast: no terminals are open. Open at least one terminal first."
+                        )
                     )
                 )
-            )
             return
 
         # Simple broadcast without confirmation if coming from Command Manager

@@ -15,21 +15,15 @@ from .settings.config import (
     APP_ID,
     APP_TITLE,
     APP_VERSION,
-    COPYRIGHT,
-    DEVELOPER_NAME,
-    DEVELOPER_TEAM,
-    ISSUE_URL,
 )
 from .settings.manager import SettingsManager, get_settings_manager
 
-# Lazy import: from .terminal.spawner import cleanup_spawner  # Only needed at shutdown
-from .utils.exceptions import handle_exception
-from .utils.logger import enable_debug_mode, get_logger, log_app_shutdown, log_app_start
-from .utils.translation_utils import _
-
 # Lazy imports for startup performance - these are used infrequently
+# from .utils.exceptions import handle_exception  # Only in error paths
 # from .utils.platform import get_platform_info  # Loaded on first access via property
 # from .utils.security import create_security_auditor  # Loaded on first access via property
+from .utils.logger import get_logger
+from .utils.translation_utils import _
 
 if TYPE_CHECKING:
     from .window import CommTerminalWindow
@@ -111,6 +105,7 @@ class CommTerminalApp(Adw.Application):
             self.logger.info(f"Applied initial GTK theme: {theme}")
 
             if self.settings_manager.get("debug_mode", False):
+                from .utils.logger import enable_debug_mode
                 enable_debug_mode()
                 self.logger.info("Debug mode enabled")
 
@@ -123,6 +118,7 @@ class CommTerminalApp(Adw.Application):
             return True
         except Exception as e:
             self.logger.critical(f"Subsystem initialization failed: {e}")
+            from .utils.exceptions import handle_exception
             handle_exception(
                 e, "application initialization", "ashyterm.app", reraise=True
             )
@@ -146,6 +142,7 @@ class CommTerminalApp(Adw.Application):
         """Handle application startup."""
         try:
             self.logger.info("Application startup initiated")
+            from .utils.logger import log_app_start
             log_app_start()
             if not self._initialize_subsystems():
                 self.logger.critical("Failed to initialize application subsystems")
@@ -496,6 +493,9 @@ class CommTerminalApp(Adw.Application):
     def _on_about_action(self, _action, _param) -> None:
         """Handle about action."""
         try:
+            from .settings.config import (
+                COPYRIGHT, DEVELOPER_NAME, DEVELOPER_TEAM, ISSUE_URL,
+            )
             about_dialog = Adw.AboutDialog(
                 application_name=APP_TITLE,
                 application_icon="ashyterm",
@@ -618,6 +618,7 @@ class CommTerminalApp(Adw.Application):
                 self._main_window = None
             if self.settings_manager:
                 self.settings_manager.save_settings()
+            from .utils.logger import log_app_shutdown
             log_app_shutdown()
             self.logger.info("Graceful shutdown completed")
         except Exception as e:

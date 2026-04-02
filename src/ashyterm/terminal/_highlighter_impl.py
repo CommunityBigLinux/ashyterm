@@ -128,7 +128,7 @@ class HighlightedTerminalProxy(CatModeHandler, StreamingHandler):
         self._next_sequence_to_feed = 0
         self._output_lock = threading.Lock()
 
-        self._line_queue: deque = deque()
+        self._line_queue: deque = deque(maxlen=2000)
         self._queue_processing = False
 
         # Buffer for partial lines
@@ -588,6 +588,7 @@ class HighlightedTerminalProxy(CatModeHandler, StreamingHandler):
     def pause_highlighting(self) -> None:
         """Pause highlighting — feed raw data while tab is inactive."""
         self._highlight_paused = True
+        self._line_queue.clear()
 
     def resume_highlighting(self) -> None:
         """Resume highlighting when tab becomes visible again."""
@@ -618,6 +619,17 @@ class HighlightedTerminalProxy(CatModeHandler, StreamingHandler):
 
         self._highlighter.unregister_proxy(self._proxy_id)
         self._shell_input_highlighter.unregister_proxy(self._proxy_id)
+
+        # Disconnect signal handlers if not already done by destroy
+        if not from_destroy and not self._widget_destroyed:
+            terminal = self._terminal_ref() if self._terminal_ref else None
+            if terminal is not None:
+                if self._destroy_handler_id:
+                    terminal.disconnect(self._destroy_handler_id)
+                    self._destroy_handler_id = None
+                if self._termprop_handler_id:
+                    terminal.disconnect(self._termprop_handler_id)
+                    self._termprop_handler_id = None
 
         if from_destroy or self._widget_destroyed:
             self._terminal_ref = None  # type: ignore[assignment]

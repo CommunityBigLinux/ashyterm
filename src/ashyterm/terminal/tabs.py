@@ -1125,6 +1125,10 @@ class TabManager:
 
     def _remove_tab_from_tracking(self, tab: Gtk.Box):
         """Remove tab from all tracking collections."""
+        # Cancel pending bell animation timeout
+        if hasattr(tab, "_bell_timeout_id"):
+            GLib.source_remove(tab._bell_timeout_id)
+            del tab._bell_timeout_id
         self.tab_bar_box.remove(tab)
         self.tabs.remove(tab)
         if tab in self.pages:

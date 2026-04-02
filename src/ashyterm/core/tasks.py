@@ -41,8 +41,8 @@ class AsyncTaskManager:
     _lock = threading.Lock()
 
     # Pool sizes
-    IO_POOL_SIZE = 20
-    CPU_POOL_SIZE = max(1, multiprocessing.cpu_count())
+    IO_POOL_SIZE = 4
+    CPU_POOL_SIZE = min(4, max(1, multiprocessing.cpu_count()))
 
     def __init__(self):
         self.logger = get_logger("ashyterm.core.tasks")

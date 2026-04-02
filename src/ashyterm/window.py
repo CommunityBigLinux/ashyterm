@@ -12,24 +12,9 @@ gi.require_version("Vte", "3.91")
 from gi.repository import Adw, Gdk, Gio, GLib, Gtk
 
 from .sessions.models import LayoutItem, SessionFolder, SessionItem
-from .sessions.operations import SessionOperations
-
-# Lazy import: from .sessions.storage import load_folders_to_store, load_sessions_and_folders, load_sessions_to_store
-from .sessions.tree import SessionTreeView
 from .settings.manager import SettingsManager
-from .state.window_state import WindowStateManager
-from .terminal.ai_assistant import TerminalAiAssistant
 from .terminal.manager import TerminalManager
-from .terminal.tabs import TabManager
-from .ui.actions import WindowActions
-from .ui.sidebar_manager import SidebarManager
-from .ui.window_ui import WindowUIBuilder
-from .ui.search_manager import SearchManager
-from .ui.broadcast_manager import BroadcastManager
-from .utils.exceptions import UIError
-from .utils.icons import icon_image
 from .utils.logger import get_logger
-from .utils.security import validate_session_data
 from .utils.translation_utils import _
 from .window_file_drop import FileDragDropManager
 
@@ -126,6 +111,7 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
                         new_close_button = Gtk.Button(
                             tooltip_text=_("Close Pane"),
                         )
+                        from .utils.icons import icon_image
                         new_close_button.set_child(icon_image("window-close-symbolic"))
                         new_close_button.add_css_class("flat")
                         new_close_button.connect(
@@ -207,6 +193,19 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
         components, creating and wiring them together.
         """
         self.logger.info("Creating and wiring core components")
+
+        # Lazy imports for startup performance
+        from .sessions.operations import SessionOperations
+        from .sessions.tree import SessionTreeView
+        from .state.window_state import WindowStateManager
+        from .terminal.ai_assistant import TerminalAiAssistant
+        from .terminal.tabs import TabManager
+        from .ui.actions import WindowActions
+        from .ui.broadcast_manager import BroadcastManager
+        from .ui.search_manager import SearchManager
+        from .ui.sidebar_manager import SidebarManager
+        from .ui.window_ui import WindowUIBuilder
+
         # Data Stores
         self.session_store = Gio.ListStore.new(SessionItem)
         self.folder_store = Gio.ListStore.new(SessionFolder)
@@ -318,6 +317,7 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
             self.action_handler.setup_actions()
         except Exception as e:
             self.logger.error(f"Failed to setup actions: {e}")
+            from .utils.exceptions import UIError
             raise UIError("window", f"action setup failed: {e}")
 
     def _setup_keyboard_shortcuts(self) -> None:
@@ -794,6 +794,7 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
             self.logger.warning(f"Failed to refresh shell input highlighter: {e}")
 
     def _on_session_activated(self, session: SessionItem) -> None:
+        from .utils.security import validate_session_data
         is_valid, errors = validate_session_data(session.to_dict())
         if not is_valid:
             self._show_error_dialog(
@@ -891,6 +892,8 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
         for terminal in terminals_in_page:
             terminal_id = getattr(terminal, "terminal_id", None)
             if terminal_id:
+                # Clean up highlight proxy before move (new window will recreate if needed)
+                self.terminal_manager._cleanup_highlight_proxy(terminal_id)
                 terminal_info = (
                     self.terminal_manager.registry.deregister_terminal_for_move(
                         terminal_id
@@ -1051,6 +1054,11 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
             return
         self._cleanup_performed = True
         self.logger.info("Performing window cleanup")
+
+        # Clean up AI assistant conversations and inflight requests
+        if hasattr(self, "ai_assistant") and self.ai_assistant:
+            self.ai_assistant.shutdown()
+
         self.terminal_manager.cleanup_all_terminals()
 
         if self.settings_manager.get("clear_remote_edit_files_on_exit", False):
@@ -1063,6 +1071,10 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
 
         # Clean up CSS providers to prevent memory leaks
         self.settings_manager.cleanup_css_providers(self)
+
+        # Disconnect session tree from AppSignals to allow GC
+        if hasattr(self, "session_tree") and self.session_tree:
+            self.session_tree.disconnect_signals()
 
     def destroy(self) -> None:
         self._perform_cleanup()
@@ -1259,6 +1271,7 @@ class CommTerminalWindow(FileDragDropManager, Adw.ApplicationWindow):
                     css_classes=["flat", "circular"],
                     tooltip_text=_("Remove this temporary file"),
                 )
+                from .utils.icons import icon_image
                 remove_button.set_child(icon_image("edit-delete-symbolic"))
 
                 # Find the correct file manager instance to call cleanup on
