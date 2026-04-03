@@ -63,6 +63,10 @@ class ConfigPaths:
                 self.CONFIG_DIR = self._get_legacy_config_dir()
 
             self.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+            try:
+                self.CONFIG_DIR.chmod(0o700)
+            except OSError:
+                pass
 
             self.SESSIONS_FILE = self.CONFIG_DIR / _SESSIONS_FILENAME
             self.SETTINGS_FILE = self.CONFIG_DIR / _SETTINGS_FILENAME

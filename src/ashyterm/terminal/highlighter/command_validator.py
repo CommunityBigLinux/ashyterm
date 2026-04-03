@@ -35,18 +35,22 @@ class CommandValidator:
     """Validates whether a command name is executable."""
 
     _instance: Optional[CommandValidator] = None
+    _instance_lock = __import__("threading").Lock()
 
     def __init__(self) -> None:
         self._path_commands: Set[str] = set()
         self._last_refresh: float = 0.0
+        self._dir_mtimes: dict[str, float] = {}
         self._enabled: bool = True
         self._refresh_path_cache()
 
     @classmethod
     def get_instance(cls) -> CommandValidator:
-        """Get or create the singleton instance."""
+        """Get or create the singleton instance (thread-safe)."""
         if cls._instance is None:
-            cls._instance = cls()
+            with cls._instance_lock:
+                if cls._instance is None:
+                    cls._instance = cls()
         return cls._instance
 
     @property
@@ -86,13 +90,37 @@ class CommandValidator:
         return command in self._path_commands
 
     def _refresh_path_cache(self) -> None:
-        """Rebuild the set of commands available in $PATH."""
-        commands: Set[str] = set()
-        path_var = os.environ.get("PATH", "")
+        """Rebuild the set of commands available in $PATH.
 
-        for directory in path_var.split(os.pathsep):
-            if not directory:
-                continue
+        Uses directory mtime to skip unchanged directories, avoiding
+        a full rescan on every TTL expiry.
+        """
+        path_var = os.environ.get("PATH", "")
+        dirs = [d for d in path_var.split(os.pathsep) if d]
+
+        # Check if any directory has changed
+        needs_full_scan = False
+        new_mtimes: dict[str, float] = {}
+        for directory in dirs:
+            try:
+                mtime = os.stat(directory).st_mtime
+            except OSError:
+                mtime = 0.0
+            new_mtimes[directory] = mtime
+            if mtime != self._dir_mtimes.get(directory, -1.0):
+                needs_full_scan = True
+
+        # Also check if PATH itself changed (new/removed dirs)
+        if set(new_mtimes.keys()) != set(self._dir_mtimes.keys()):
+            needs_full_scan = True
+
+        if not needs_full_scan and self._path_commands:
+            # No changes detected, keep existing cache
+            self._last_refresh = time.monotonic()
+            return
+
+        commands: Set[str] = set()
+        for directory in dirs:
             try:
                 with os.scandir(directory) as entries:
                     for entry in entries:
@@ -105,6 +133,7 @@ class CommandValidator:
                 continue
 
         self._path_commands = commands
+        self._dir_mtimes = new_mtimes
         self._last_refresh = time.monotonic()
 
     def invalidate_cache(self) -> None:

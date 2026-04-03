@@ -767,11 +767,14 @@ class StreamingHandler:
             self._need_color_reset = False
 
     def _append_to_input_buffer(self, text: str) -> None:
-        """Append text to input highlight buffer."""
+        """Append text to input highlight buffer, capping at 4096 chars."""
+        _MAX_BUFFER = 4096
         if not self._input_highlight_buffer:
             self._input_highlight_buffer = text
         else:
             self._input_highlight_buffer += text
+        if len(self._input_highlight_buffer) > _MAX_BUFFER:
+            self._input_highlight_buffer = self._input_highlight_buffer[-_MAX_BUFFER:]
 
     def _highlight_shell_input(self, text: str, term: Vte.Terminal) -> Optional[bytes]:
         """Apply highlighting to shell input."""
@@ -843,6 +846,19 @@ class StreamingHandler:
         if not token_value:
             return token_type
 
+        # Shell builtins (echo, cd, export) → command color for consistency
+        if token_type in Token.Name.Builtin:
+            return Token.Name.Function
+
+        # Early return for tokens that can't be commands or options
+        if token_type not in (Token.Text, Token.Name):
+            # Only check options for text-like tokens
+            if token_value.startswith("--") or (
+                token_value.startswith("-") and len(token_value) > 1
+            ):
+                return Token.Name.Attribute
+            return token_type
+
         # Check for options
         if token_value.startswith("--") or (
             token_value.startswith("-") and len(token_value) > 1
@@ -850,21 +866,30 @@ class StreamingHandler:
             return Token.Name.Attribute
 
         # Check for command position
-        if token_type in (Token.Text, Token.Name):
-            if self._is_command_position(token_value):
-                WARNING_COMMANDS = {"sudo", "doas", "pkexec", "rm", "dd"}
-                if token_value in WARNING_COMMANDS:
-                    return Token.Name.Exception
-                # Validate command exists in $PATH or as builtin
-                validator = _CommandValidator.get_instance()
-                if validator.enabled and not validator.is_valid_command(token_value):
-                    return _COMMAND_NOT_FOUND
-                return Token.Name.Function
+        if self._is_command_position(token_value):
+            # Detect variable assignment (VAR=value at command position)
+            current_line = self._input_highlight_buffer.split("\n")[-1]
+            after = current_line.split(token_value, 1)
+            if len(after) > 1 and after[1].startswith("="):
+                return token_type  # Variable assignment, not a command
+
+            WARNING_COMMANDS = {"sudo", "doas", "pkexec", "rm", "dd"}
+            if token_value in WARNING_COMMANDS:
+                return Token.Name.Exception
+            # Validate command exists in $PATH or as builtin
+            validator = _CommandValidator.get_instance()
+            if validator.enabled and not validator.is_valid_command(token_value):
+                return _COMMAND_NOT_FOUND
+            return Token.Name.Function
 
         return token_type
 
     def _is_command_position(self, token_value: str) -> bool:
-        """Check if token is in command position."""
+        """Check if token is in command position.
+
+        Optimized to avoid full buffer split when possible by checking
+        the text before the token directly.
+        """
         PREFIX_COMMANDS = {
             "sudo",
             "time",
@@ -877,21 +902,27 @@ class StreamingHandler:
             "pkexec",
         }
         current_line = self._input_highlight_buffer.split("\n")[-1].strip()
+
+        # Fast path: first word on the line
+        if not current_line or current_line == token_value:
+            return True
+
         words_before = current_line.rsplit(token_value, 1)[0].rstrip()
+        if not words_before:
+            return True
 
-        is_command_position = not words_before or words_before.endswith(
-            (
-                "|",
-                ";",
-                "&&",
-                "||",
-                "(",
-                "`",
-                "$(",
-            )
-        )
+        # Check if preceded by an operator
+        is_command_position = words_before.endswith((
+            "|",
+            ";",
+            "&&",
+            "||",
+            "(",
+            "`",
+            "$(",
+        ))
 
-        if not is_command_position and words_before:
+        if not is_command_position:
             last_word = words_before.split()[-1] if words_before.split() else ""
             if last_word in PREFIX_COMMANDS:
                 is_command_position = True

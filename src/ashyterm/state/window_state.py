@@ -2,6 +2,7 @@
 
 import json
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import gi
@@ -15,7 +16,7 @@ from ..sessions.models import LayoutItem, SessionItem
 from ..settings.config import LAYOUT_DIR, STATE_FILE
 from ..utils.json_versioning import migrate_data, stamp_version
 from ..utils.logger import get_logger
-from ..utils.security import InputSanitizer
+from ..utils.security import InputSanitizer, atomic_json_write
 from ..utils.translation_utils import _
 from ..utils.accessibility import set_label as a11y_label
 
@@ -50,8 +51,7 @@ class WindowStateManager:
                     state["tabs"].append(tab_structure)
 
         try:
-            with open(STATE_FILE, "w") as f:
-                json.dump(state, f, indent=2)
+            atomic_json_write(Path(STATE_FILE), state)
             self.logger.info("Session state saved successfully.")
         except Exception as e:
             self.logger.error(f"Failed to save session state: {e}")
@@ -139,8 +139,7 @@ class WindowStateManager:
                     state["tabs"].append(tab_structure)
 
         try:
-            with open(target_file, "w") as f:
-                json.dump(state, f, indent=2)
+            atomic_json_write(Path(target_file), state)
             self.logger.info(f"Layout '{layout_name}' saved successfully.")
             self.window.toast_overlay.add_toast(Adw.Toast(title=_("Layout Saved")))
             self.load_layouts()
@@ -277,8 +276,7 @@ class WindowStateManager:
 
             state["folder_path"] = new_folder
 
-            with open(layout_file, "w") as f:
-                json.dump(state, f, indent=2)
+            atomic_json_write(Path(layout_file), state)
 
             self.logger.info(f"Moved layout '{layout_name}' to folder '{new_folder}'")
             self.load_layouts()

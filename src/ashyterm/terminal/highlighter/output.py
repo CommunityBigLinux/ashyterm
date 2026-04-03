@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 
 # Singleton instance
 _output_highlighter: Optional["OutputHighlighter"] = None
+_output_highlighter_lock = threading.Lock()
 
 
 class OutputHighlighter:
@@ -82,6 +83,7 @@ class OutputHighlighter:
         self.logger.info("Using regex module (PCRE2) for high-performance highlighting")
 
         self._refresh_rules()
+        self._precompile_common_contexts()
         self._manager.connect("rules-changed", self._on_rules_changed)
 
     def _refresh_ignored_commands(self) -> None:
@@ -231,6 +233,29 @@ class OutputHighlighter:
                 f"({literal_count} literal, {regex_count} regex)"
             )
 
+    def _precompile_common_contexts(self) -> None:
+        """Pre-compile rules for commonly used contexts to avoid first-use latency."""
+        _COMMON_CONTEXTS = (
+            "ping",
+            "docker",
+            "git",
+            "systemctl",
+            "journalctl",
+            "apt",
+            "pacman",
+            "pip",
+            "make",
+            "cmake",
+        )
+        for name in _COMMON_CONTEXTS:
+            if self._manager.get_context_for_command(name):
+                try:
+                    self._context_rules_cache[name] = self._compile_rules_for_context(
+                        name
+                    )
+                except Exception:
+                    pass
+
     def set_context(
         self, command_name: str, proxy_id: int = 0, full_command: str = ""
     ) -> bool:
@@ -317,10 +342,14 @@ class OutputHighlighter:
         with self._lock:
             return self._full_commands.get(proxy_id, "")
 
+    def _get_context_unlocked(self, proxy_id: int = 0) -> str:
+        """Get context without acquiring lock. Caller must hold self._lock."""
+        return self._proxy_contexts.get(proxy_id, "")
+
     def get_context(self, proxy_id: int = 0) -> str:
         """Get the current context name for a specific proxy."""
         with self._lock:
-            return self._proxy_contexts.get(proxy_id, "")
+            return self._get_context_unlocked(proxy_id)
 
     def should_skip_first_output(self, proxy_id: int = 0) -> bool:
         """
@@ -422,7 +451,7 @@ class OutputHighlighter:
 
         # Fast path: get context and rules with minimal locking
         with self._lock:
-            context = self.get_context(proxy_id)
+            context = self._get_context_unlocked(proxy_id)
 
             # Early return for ignored commands (tools with native coloring)
             # This preserves their ANSI colors and saves CPU
@@ -452,7 +481,7 @@ class OutputHighlighter:
             return line
 
         with self._lock:
-            context = self.get_context(proxy_id)
+            context = self._get_context_unlocked(proxy_id)
 
             # Early return for ignored commands (tools with native coloring)
             # This preserves their ANSI colors and saves CPU
@@ -644,10 +673,12 @@ class OutputHighlighter:
 
 
 def get_output_highlighter() -> OutputHighlighter:
-    """Get or create the singleton OutputHighlighter instance."""
+    """Get or create the singleton OutputHighlighter instance (thread-safe)."""
     global _output_highlighter
     if _output_highlighter is None:
-        _output_highlighter = OutputHighlighter()
+        with _output_highlighter_lock:
+            if _output_highlighter is None:
+                _output_highlighter = OutputHighlighter()
     return _output_highlighter
 
 

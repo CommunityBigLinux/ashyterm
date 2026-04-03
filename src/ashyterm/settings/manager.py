@@ -19,6 +19,7 @@ from ..utils.json_versioning import migrate_data, stamp_version
 from ..utils.logger import get_logger, log_error_with_context
 from ..utils.platform import get_platform_info
 from ..utils.security import (
+    atomic_json_write,
     ensure_secure_file_permissions,
     validate_file_path,
 )
@@ -214,8 +215,7 @@ class SettingsManager:
 
     def save_custom_schemes(self):
         try:
-            with open(self.custom_schemes_file, "w", encoding="utf-8") as f:
-                json.dump(self.custom_schemes, f, indent=2)
+            atomic_json_write(self.custom_schemes_file, self.custom_schemes)
             self.logger.info(f"Saved {len(self.custom_schemes)} custom schemes.")
         except Exception as e:
             self.logger.error(f"Failed to save custom color schemes: {e}")

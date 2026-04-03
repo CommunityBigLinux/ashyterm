@@ -6,6 +6,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import gi
@@ -16,6 +17,7 @@ from gi.repository import Adw, GLib, GObject, Gtk
 
 from ..utils.icons import icon_button
 from ..utils.logger import get_logger
+from ..utils.security import atomic_json_write
 from ..utils.tooltip_helper import get_tooltip_helper
 from ..utils.translation_utils import _
 
@@ -159,8 +161,7 @@ class TransferManager(GObject.Object):
                 }
                 data_to_save.append(serializable_item)
 
-            with open(self.history_file, "w", encoding="utf-8") as f:
-                json.dump(data_to_save, f, indent=2)
+            atomic_json_write(Path(self.history_file), data_to_save)
         except Exception as e:
             self.logger.error(f"Failed to save transfer history: {e}")
 

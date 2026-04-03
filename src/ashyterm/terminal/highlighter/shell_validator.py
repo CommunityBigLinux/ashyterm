@@ -100,6 +100,58 @@ def _scan_brackets_and_quotes(buffer: str, issues: List[SyntaxIssue]) -> None:
             i += 2
             continue
 
+        # Handle heredoc (<<EOF ... EOF or <<-EOF ... EOF or <<<)
+        if ch == "<" and i + 1 < length and buffer[i + 1] == "<":
+            if i + 2 < length and buffer[i + 2] == "<":
+                # Here-string (<<<) — skip to end of line
+                i += 3
+                while i < length and buffer[i] != "\n":
+                    i += 1
+                continue
+            # Heredoc: <<[-]DELIMITER
+            i += 2
+            if i < length and buffer[i] == "-":
+                i += 1
+            # Skip whitespace before delimiter
+            while i < length and buffer[i] in (" ", "\t"):
+                i += 1
+            # Extract delimiter (may be quoted)
+            delim_start = i
+            quote_char = ""
+            if i < length and buffer[i] in ("'", '"', "\\"):
+                quote_char = buffer[i]
+                i += 1
+            while i < length and buffer[i] not in (
+                " ",
+                "\t",
+                "\n",
+                ";",
+                quote_char if quote_char else "",
+            ):
+                i += 1
+            delimiter = buffer[delim_start:i].strip("'\"\\")
+            if quote_char and i < length and buffer[i] == quote_char:
+                i += 1
+            if not delimiter:
+                continue
+            # Skip to the closing delimiter line
+            while i < length:
+                # Find start of next line
+                nl = buffer.find("\n", i)
+                if nl == -1:
+                    i = length
+                    break
+                i = nl + 1
+                # Check if this line is the closing delimiter
+                line_end = buffer.find("\n", i)
+                if line_end == -1:
+                    line_end = length
+                line_content = buffer[i:line_end].strip()
+                if line_content == delimiter:
+                    i = line_end
+                    break
+            continue
+
         # Handle single quotes
         if ch == "'":
             start = i
