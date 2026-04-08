@@ -7,12 +7,12 @@ import gettext
 import os
 from typing import Callable
 
-# Determine locale directory (works in AppImage and system install)
-locale_dir = "/usr/share/locale"  # Default for system install
+# Locale dir resolution: env override → AppImage → system default
+# ASHYTERM_LOCALE_DIR env → dev/testing flexibility
+locale_dir = os.environ.get("ASHYTERM_LOCALE_DIR", "/usr/share/locale")
 
 # Check if we're in an AppImage
 if "APPIMAGE" in os.environ or "APPDIR" in os.environ:
-    # Running from AppImage
     # translation_utils.py is in: src/ashyterm/utils/translation_utils.py
     # We need to get to: usr/share/locale
     script_dir = os.path.dirname(os.path.abspath(__file__))  # src/ashyterm/utils

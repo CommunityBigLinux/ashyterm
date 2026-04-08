@@ -96,6 +96,7 @@ def _make_highlighter(rules_tuple):
 def _compile_rules_from_json(json_data: dict):
     """Compile a list of CompiledRule / LiteralKeywordRule from raw JSON data."""
     from ashyterm.settings.highlights import HighlightManager, HighlightRule
+    from ashyterm.settings.highlight_colors import HighlightColorResolver
     from ashyterm.terminal.highlighter.output import OutputHighlighter
     from ashyterm.terminal.highlighter.rules import (
         CompiledRule,
@@ -107,10 +108,8 @@ def _compile_rules_from_json(json_data: dict):
 
     # Use a real manager for color resolution
     mgr = HighlightManager.__new__(HighlightManager)
-    mgr.logger = MagicMock()
-    mgr._settings_manager = None
-    mgr._color_cache = {}
-    mgr._current_theme_name = "default"
+    mgr._colors = HighlightColorResolver()
+    mgr._config = type('MockConfig', (), {'enabled_for_local': False, 'enabled_for_ssh': False, 'context_aware_enabled': True, 'global_rules': [], 'contexts': {}})()
 
     compiled = []
     for rd in json_data.get("rules", []):

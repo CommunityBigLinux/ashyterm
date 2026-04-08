@@ -17,6 +17,7 @@ gi.require_version("Gdk", "4.0")
 gi.require_version("GLib", "2.0")
 gi.require_version("Pango", "1.0")
 
+# noqa: E402 — gi.require_version must precede imports
 from gi.repository import Adw, Gdk, GLib, Gtk, Pango  # noqa: E402
 
 __all__ = ["Adw", "Gdk", "GLib", "Gtk", "Pango", "gi"]

@@ -130,51 +130,27 @@ class WindowUIBuilder:
         self.window.set_content(main_box)
         self.logger.info("Main window UI constructed successfully.")
 
+    def _load_css(self, filename: str, priority=Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION) -> None:
+        """Load a CSS file from the styles directory and apply it globally."""
+        provider = Gtk.CssProvider()
+        css_path = _STYLES_DIR / filename
+        if css_path.exists():
+            provider.load_from_path(str(css_path))
+            self.logger.debug(f"Loaded CSS from {css_path}")
+        else:
+            self.logger.warning(f"CSS file not found: {css_path}")
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(), provider, priority,
+        )
+
     def _setup_styles(self) -> None:
         """Applies application-wide CSS for various custom widgets."""
-        # Load main window styles
-        provider = Gtk.CssProvider()
-        css_file = _STYLES_DIR / "window.css"
+        self._load_css("window.css")
+        self._load_css("components.css")
 
-        if css_file.exists():
-            provider.load_from_path(str(css_file))
-            self.logger.debug(f"Loaded CSS styles from {css_file}")
-        else:
-            self.logger.warning(f"CSS file not found: {css_file}")
-
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
-
-        # Load shared component styles (color indicators, code containers, etc.)
-        components_provider = Gtk.CssProvider()
-        components_css = _STYLES_DIR / "components.css"
-
-        if components_css.exists():
-            components_provider.load_from_path(str(components_css))
-            self.logger.debug(f"Loaded component CSS from {components_css}")
-
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            components_provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
-        )
-
-        # Load dialog styles (command manager, command guide, etc.)
-        # DEFERRED: Not needed for initial window render
+        # Deferred: not needed for initial window render
         def load_dialog_styles():
-            dialogs_provider = Gtk.CssProvider()
-            dialogs_css = _STYLES_DIR / "dialogs.css"
-
-            if dialogs_css.exists():
-                dialogs_provider.load_from_path(str(dialogs_css))
-                self.logger.debug(f"Loaded dialog CSS from {dialogs_css}")
-
-            Gtk.StyleContext.add_provider_for_display(
-                Gdk.Display.get_default(),
-                dialogs_provider,
-                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
-            )
+            self._load_css("dialogs.css")
             return GLib.SOURCE_REMOVE
 
         GLib.idle_add(load_dialog_styles, priority=GLib.PRIORITY_LOW)
@@ -729,7 +705,6 @@ class WindowUIBuilder:
 
         # Session tree in scrolled window (main content)
         scrolled_window = Gtk.ScrolledWindow(vexpand=True)
-        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scrolled_window.set_child(self.session_tree.get_widget())
         scrolled_window.add_css_class("sidebar-session-tree")
         normal_view.append(scrolled_window)

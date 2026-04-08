@@ -224,7 +224,7 @@ class ColorEntryRow(Adw.ActionRow):
         """Update the color preview box showing foreground, background, and effects."""
         manager = get_highlight_manager()
 
-        fg_hex = manager.resolve_color(self._fg_color)
+        manager.resolve_color(self._fg_color)
 
         bg_hex = None
         if self._bg_color:
@@ -235,37 +235,17 @@ class ColorEntryRow(Adw.ActionRow):
             )
             bg_hex = manager.resolve_color(bg_color_name)
 
-        fill_style = f"background-color: {fg_hex};"
 
         if bg_hex:
-            base_width = 4
-            border_args = f"{bg_hex}"
+            pass
         else:
-            base_width = 2
-            border_args = "alpha(currentColor, 0.3)"
+            pass
 
-        border_width = 5 if "bold" in self._effects else base_width
-        line_style = "dashed" if "italic" in self._effects else "solid"
 
-        border_style_value = f"{border_width}px {line_style} {border_args}"
 
-        css_provider = Gtk.CssProvider()
-        css = f"""
-        .color-preview {{
-            {fill_style}
-            border-radius: 50%;
-            border: {border_style_value};
-        }}
-        """
-        css_provider.load_from_data(css.encode("utf-8"))
+        from .global_rules_delegate import GlobalRulesDelegate
 
-        context = self._color_box.get_style_context()
-        if self._css_provider:
-            context.remove_provider(self._css_provider)
-
-        context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        self._color_box.add_css_class("color-preview")
-        self._css_provider = css_provider
+        GlobalRulesDelegate.apply_color_to_box(self._color_box, self._current_hex)
 
     @property
     def color_name(self) -> str:

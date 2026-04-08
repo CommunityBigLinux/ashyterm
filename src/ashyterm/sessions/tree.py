@@ -368,10 +368,7 @@ class SessionTreeView:
 
     def _on_column_view_focus_enter(self, controller: Gtk.EventControllerFocus) -> None:
         """Handle focus entering the column view to ensure proper navigation."""
-        if self.selection_model.get_selection().get_size() == 0:
-            # Select first item if nothing is selected
-            if self.filter_model.get_n_items() > 0:
-                self.selection_model.select_item(0, True)
+        pass
 
     def _on_factory_setup(
         self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
@@ -385,7 +382,7 @@ class SessionTreeView:
         box.append(spacer)
 
         icon = Gtk.Image()
-        label = Gtk.Label(xalign=0.0, hexpand=True)
+        label = Gtk.Label(hexpand=True)
         box.append(icon)
         box.append(label)
         list_item.set_child(box)

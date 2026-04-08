@@ -15,7 +15,7 @@ from .platform import get_config_directory
 
 
 def _get_py7zr():
-    """Lazy import for py7zr module. Only called when backup/restore is used."""
+    """Lazy import py7zr → defer until backup/restore used."""
     try:
         import py7zr
 
@@ -25,7 +25,7 @@ def _get_py7zr():
 
 
 class BackupManager:
-    """Manages encrypted backup and recovery operations."""
+    """Encrypted backup / recovery operations."""
 
     def __init__(self, backup_dir: Optional[Path] = None):
         self.logger = get_logger("ashyterm.backup")
@@ -39,20 +39,20 @@ class BackupManager:
         )
 
     def _copy_source_files(self, source_files: List[Path], temp_path: Path) -> None:
-        """Copy primary source files to temporary directory."""
+        """Copy source files → temp dir."""
         for src_file in source_files:
             if src_file.exists():
                 shutil.copy(src_file, temp_path / src_file.name)
 
     def _copy_layouts_directory(self, layouts_dir: Path, temp_path: Path) -> None:
-        """Copy layouts directory to temporary directory."""
+        """Copy layouts dir → temp dir."""
         if layouts_dir.exists() and layouts_dir.is_dir():
             shutil.copytree(layouts_dir, temp_path / "layouts", dirs_exist_ok=True)
 
     def _export_passwords_to_temp(
         self, sessions_store: Gio.ListStore, temp_path: Path
     ) -> None:
-        """Export passwords from sessions store to temporary directory."""
+        """Export passwords → temp dir via sessions_store."""
         from .crypto import export_all_passwords
 
         passwords = export_all_passwords(sessions_store)
@@ -63,7 +63,7 @@ class BackupManager:
     def _create_7z_archive(
         self, py7zr, target_file_path: str, password: str, temp_path: Path
     ) -> None:
-        """Create encrypted 7z archive from temporary directory."""
+        """Create encrypted 7z archive from temp dir."""
         self.logger.info(f"Creating encrypted backup at {target_file_path}")
         with py7zr.SevenZipFile(target_file_path, "w", password=password) as archive:
             archive.writeall(temp_path, arcname="")
@@ -77,18 +77,17 @@ class BackupManager:
         source_files: List[Path],
         layouts_dir: Path,
     ) -> None:
-        """
-        Creates a single, password-protected .7z backup file.
+        """Create password-protected .7z backup.
 
         Args:
-            target_file_path: The full path where the backup file will be saved.
-            password: The password for encrypting the backup.
-            sessions_store: The session store to export passwords from.
-            source_files: List of primary config files to include (e.g., sessions.json).
-            layouts_dir: The directory containing layout files to be backed up.
+            target_file_path: backup output path
+            password: encryption password
+            sessions_store: session store → export passwords
+            source_files: config files to include
+            layouts_dir: layout files dir
 
         Raises:
-            StorageWriteError: If the backup process fails.
+            StorageWriteError: backup process fail
         """
         py7zr = _get_py7zr()
         if not py7zr:
@@ -116,13 +115,13 @@ class BackupManager:
     def _extract_archive(
         self, py7zr, source_file_path: str, password: str, temp_path: Path
     ) -> None:
-        """Extract 7z archive to temporary directory."""
+        """Extract 7z archive → temp dir."""
         self.logger.info(f"Extracting backup from {source_file_path}")
         with py7zr.SevenZipFile(source_file_path, "r", password=password) as archive:
             archive.extractall(path=temp_path)
 
     def _restore_files_from_temp(self, temp_path: Path, config_dir: Path) -> None:
-        """Restore files from temporary directory to config directory."""
+        """Restore temp dir contents → config dir."""
         for item in temp_path.iterdir():
             target_path = config_dir / item.name
             if item.is_dir():
@@ -132,7 +131,7 @@ class BackupManager:
                 shutil.copy(item, target_path)
 
     def _import_passwords_from_backup(self, passwords_file: Path) -> None:
-        """Import passwords from backup file to system keyring."""
+        """Import passwords from backup → system keyring."""
         if not passwords_file.exists():
             return
 
@@ -155,7 +154,7 @@ class BackupManager:
     def _handle_restore_errors(
         self, py7zr, e: Exception, source_file_path: str
     ) -> None:
-        """Handle errors during restore operation."""
+        """Handle restore errors → classify + raise StorageReadError."""
         if isinstance(e, py7zr.exceptions.PasswordRequired):
             self.logger.error("Password required for backup file.")
             raise StorageReadError(source_file_path, "Password required.") from e
@@ -177,16 +176,15 @@ class BackupManager:
     def restore_from_encrypted_backup(
         self, source_file_path: str, password: str, config_dir: Path
     ) -> None:
-        """
-        Restores configuration from a password-protected .7z backup file.
+        """Restore config from password-protected .7z backup.
 
         Args:
-            source_file_path: The path to the .7z backup file.
-            password: The password to decrypt the backup.
-            config_dir: The root configuration directory to restore files to.
+            source_file_path: .7z backup file path
+            password: decrypt password
+            config_dir: target config directory
 
         Raises:
-            StorageReadError: If the restore process fails.
+            StorageReadError: restore process fail
         """
         py7zr = _get_py7zr()
         if not py7zr:
@@ -216,7 +214,7 @@ _backup_manager_lock = threading.Lock()
 
 
 def get_backup_manager() -> BackupManager:
-    """Get the global backup manager instance."""
+    """Get global backup manager singleton."""
     global _backup_manager
     if _backup_manager is None:
         with _backup_manager_lock:

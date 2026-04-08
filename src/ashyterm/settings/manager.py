@@ -657,10 +657,10 @@ class SettingsManager:
                 f".sidebar-container {{ background-color: {sidebar_rgba}; }}"
             )
             sidebar_css_parts.append(
-                f".sidebar-toolbar {{ background-color: transparent; }}"
+                ".sidebar-toolbar { background-color: transparent; }"
             )
             sidebar_css_parts.append(
-                f"popover.sidebar-popover .sidebar-container {{ background-color: transparent; }}"
+                "popover.sidebar-popover .sidebar-container { background-color: transparent; }"
             )
 
         # Use GTK named color (@window_fg_color) so the sidebar text/icons

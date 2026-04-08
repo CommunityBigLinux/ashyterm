@@ -7,7 +7,6 @@ from typing import Dict, Any
 import gi
 
 gi.require_version("Adw", "1")
-from gi.repository import Adw
 
 
 class ThemeEngine:
@@ -136,9 +135,7 @@ class ThemeEngine:
         if gtk_theme_name == "terminal":
             base_bg = params["header_bg_color"]
         else:
-            style_manager = Adw.StyleManager.get_default()
-            is_dark = style_manager.get_dark()
-            base_bg = "#303030" if is_dark else "#f0f0f0"
+            base_bg = "@headerbar_bg_color"
 
         opacity_percent = 100 - user_transparency
         bg_css_value = f"color-mix(in srgb, {base_bg} {opacity_percent}%, transparent)"

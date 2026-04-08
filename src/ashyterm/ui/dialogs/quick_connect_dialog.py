@@ -63,9 +63,6 @@ class QuickConnectDialog(Adw.Dialog):
             selection_mode=Gtk.SelectionMode.NONE,
             css_classes=["boxed-list"],
         )
-        self._list_box.set_margin_start(12)
-        self._list_box.set_margin_end(12)
-        self._list_box.set_margin_bottom(12)
         scrolled.set_child(self._list_box)
 
         # Empty state

@@ -24,7 +24,6 @@ from ...utils.translation_utils import _
 from ...utils.accessibility import set_label as a11y_label
 from ..widgets.bash_text_view import BashTextView
 from .base_dialog import BaseDialog, validate_directory_path
-from ..widgets.action_rows import ManagedListRow
 
 
 class SessionEditDialog(BaseDialog):
@@ -536,10 +535,6 @@ class SessionEditDialog(BaseDialog):
         scrolled = Gtk.ScrolledWindow()
         scrolled.set_min_content_height(130)
         scrolled.set_max_content_height(220)
-        scrolled.set_margin_start(12)
-        scrolled.set_margin_end(12)
-        scrolled.set_margin_top(6)
-        scrolled.set_margin_bottom(12)
         scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scrolled.add_css_class("startup-commands-container")
 
@@ -733,10 +728,6 @@ class SessionEditDialog(BaseDialog):
         post_login_scrolled.set_min_content_height(100)
         post_login_scrolled.set_max_content_height(160)
         post_login_scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        post_login_scrolled.set_margin_start(12)
-        post_login_scrolled.set_margin_end(12)
-        post_login_scrolled.set_margin_top(4)
-        post_login_scrolled.set_margin_bottom(8)
         post_login_scrolled.add_css_class("startup-commands-container")
 
         # Use BashTextView for syntax highlighting
@@ -902,55 +893,14 @@ class SessionEditDialog(BaseDialog):
         pass  # No longer used
 
     def _refresh_port_forward_list(self) -> None:
-        if not self.port_forward_list:
-            return
-        # Gtk4 ListBox does not expose get_children; iterate manually.
-        child = self.port_forward_list.get_first_child()
-        while child:
-            next_child = child.get_next_sibling()
-            self.port_forward_list.remove(child)
-            child = next_child
+        from .session_edit_port_forward import refresh_port_forward_list as _refresh
 
-        if not self.port_forwardings:
-            placeholder_row = Gtk.ListBoxRow()
-            placeholder_row.set_selectable(False)
-            placeholder_row.set_activatable(False)
-            label = Gtk.Label(
-                label=_("No port forwards configured."),
-                xalign=0,
-                margin_top=6,
-                margin_bottom=6,
-                margin_start=12,
-                margin_end=12,
-            )
-            label.add_css_class(BaseDialog.CSS_CLASS_DIM_LABEL)
-            placeholder_row.set_child(label)
-            self.port_forward_list.append(placeholder_row)
-            return
-
-        for index, tunnel in enumerate(self.port_forwardings):
-            remote_host_display = tunnel.get("remote_host") or _("SSH Server Address")
-            subtitle_text = _(
-                "{local_host}:{local_port} → {remote_host}:{remote_port}"
-            ).format(
-                local_host=tunnel.get("local_host", "localhost"),
-                local_port=tunnel.get("local_port", 0),
-                remote_host=remote_host_display,
-                remote_port=tunnel.get("remote_port", 0),
-            )
-
-            row = ManagedListRow(
-                title=tunnel.get("name", _("Tunnel")),
-                subtitle=subtitle_text,
-                show_reorder=False,
-                show_actions=True,
-                show_toggle=False,
-            )
-
-            row.connect("edit-clicked", self._on_edit_port_forward_clicked, index)
-            row.connect("delete-clicked", self._on_delete_port_forward_clicked, index)
-
-            self.port_forward_list.append(row)
+        _refresh(
+            self.port_forward_list,
+            self.port_forwardings,
+            on_edit=self._on_edit_port_forward_clicked,
+            on_delete=self._on_delete_port_forward_clicked,
+        )
 
     def _on_add_port_forward_clicked(self, _button) -> None:
         new_entry = self._show_port_forward_dialog()
@@ -977,144 +927,13 @@ class SessionEditDialog(BaseDialog):
     def _show_port_forward_dialog(
         self, existing: Optional[dict] = None
     ) -> Optional[dict]:
-        is_edit = existing is not None
+        """Delegate to extracted port forward dialog module."""
+        from .session_edit_port_forward import show_port_forward_dialog as _pf_dialog
 
-        # Use Adw.Window with ToolbarView for consistency
-        dialog = Adw.Window(
-            transient_for=self,
-            modal=True,
-            default_width=600,
-            default_height=600,
-        )
-        dialog.set_title(_("Edit Port Forward") if is_edit else _("Add Port Forward"))
-
-        # Use Adw.ToolbarView for proper layout
-        toolbar_view = Adw.ToolbarView()
-        dialog.set_content(toolbar_view)
-
-        # Header bar with buttons
-        header_bar = Adw.HeaderBar()
-        header_bar.set_show_end_title_buttons(True)
-        header_bar.set_show_start_title_buttons(False)
-
-        cancel_button = Gtk.Button(label=_("Cancel"))
-        cancel_button.connect("clicked", lambda b: dialog.close())
-        header_bar.pack_start(cancel_button)
-
-        save_button = Gtk.Button(
-            label=_("Save"), css_classes=[BaseDialog.CSS_CLASS_SUGGESTED]
-        )
-        header_bar.pack_end(save_button)
-
-        toolbar_view.add_top_bar(header_bar)
-
-        # Scrolled content with preferences page
-        widgets = self._create_port_forward_ui(toolbar_view, existing)
-
-        result: Optional[dict] = None
-
-        def on_save(_button):
-            nonlocal result
-            data = self._get_port_forward_data(widgets)
-            errors = self._validate_port_forward_data(data)
-            if errors:
-                self._show_error_dialog(_("Invalid Port Forward"), "\n".join(errors))
-                return
-
-            result = data
-            dialog.close()
-
-        save_button.connect("clicked", on_save)
-
-        # Run dialog blocking
-        loop = GLib.MainLoop()
-        dialog.connect("close-request", lambda _: loop.quit())
-        dialog.present()
-        loop.run()
-
+        result = _pf_dialog(self, existing)
+        if result:
+            self._mark_changed()
         return result
-
-    def _create_port_forward_ui(
-        self, toolbar_view: Adw.ToolbarView, existing: Optional[dict]
-    ) -> dict:
-        """Create UI content for port forward dialog and return widgets dict."""
-        scrolled = Gtk.ScrolledWindow()
-        scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        toolbar_view.set_content(scrolled)
-
-        prefs_page = Adw.PreferencesPage()
-        scrolled.set_child(prefs_page)
-
-        existing = existing or {}
-        widgets = {}
-
-        # Name
-        group = Adw.PreferencesGroup()
-        prefs_page.add(group)
-        widgets["name"] = Adw.EntryRow(title=_("Tunnel Name"))
-        widgets["name"].set_text(existing.get("name", ""))
-        group.add(widgets["name"])
-
-        # Local
-        local_group = Adw.PreferencesGroup(title=_("Local Settings"))
-        prefs_page.add(local_group)
-
-        widgets["local_host"] = Adw.EntryRow(title=_("Local Address"))
-        widgets["local_host"].set_text(existing.get("local_host", "localhost"))
-        local_group.add(widgets["local_host"])
-
-        widgets["local_port"] = Adw.SpinRow.new_with_range(1, 65535, 1)
-        widgets["local_port"].set_title(_("Local Port"))
-        widgets["local_port"].set_subtitle(
-            _("Port on your machine (1025-65535 recommended)")
-        )
-        widgets["local_port"].set_value(existing.get("local_port", 8080))
-        local_group.add(widgets["local_port"])
-
-        # Remote
-        remote_group = Adw.PreferencesGroup(title=_("Remote Settings"))
-        prefs_page.add(remote_group)
-
-        use_custom = bool(existing.get("remote_host"))
-        widgets["remote_toggle"] = Adw.SwitchRow(
-            title=_("Use Custom Remote Address"),
-            subtitle=_("Leave off to use the SSH server as target"),
-            active=use_custom,
-        )
-        remote_group.add(widgets["remote_toggle"])
-
-        widgets["remote_host"] = Adw.EntryRow(title=_("Remote Address"))
-        widgets["remote_host"].set_text(existing.get("remote_host", ""))
-        widgets["remote_host"].set_visible(use_custom)
-        remote_group.add(widgets["remote_host"])
-
-        def on_remote_toggle(switch, _p):
-            widgets["remote_host"].set_visible(switch.get_active())
-
-        widgets["remote_toggle"].connect(
-            BaseDialog.SIGNAL_NOTIFY_ACTIVE, on_remote_toggle
-        )
-
-        widgets["remote_port"] = Adw.SpinRow.new_with_range(1, 65535, 1)
-        widgets["remote_port"].set_title(_("Remote Port"))
-        widgets["remote_port"].set_subtitle(_("Port on the remote host (1-65535)"))
-        widgets["remote_port"].set_value(existing.get("remote_port", 80))
-        remote_group.add(widgets["remote_port"])
-
-        return widgets
-
-    def _get_port_forward_data(self, widgets: dict) -> dict:
-        """Extract data from port forward widgets."""
-        is_custom_remote = widgets["remote_toggle"].get_active()
-        return {
-            "name": widgets["name"].get_text().strip() or _("Tunnel"),
-            "local_host": widgets["local_host"].get_text().strip() or "localhost",
-            "local_port": int(widgets["local_port"].get_value()),
-            "remote_port": int(widgets["remote_port"].get_value()),
-            "remote_host": widgets["remote_host"].get_text().strip()
-            if is_custom_remote
-            else "",
-        }
 
     def _on_validated_entry_changed(self, entry) -> None:
         entry.remove_css_class(self.CSS_CLASS_ERROR)

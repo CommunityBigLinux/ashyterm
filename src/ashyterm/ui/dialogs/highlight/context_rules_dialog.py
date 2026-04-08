@@ -336,24 +336,10 @@ class ContextRulesDialog(BaseDialog):
         return row
 
     def _apply_color_to_box(self, box: Gtk.Box, hex_color: str) -> None:
-        """Apply a color as background to a box widget."""
-        css_provider = Gtk.CssProvider()
-        css = f"""
-        .rule-color-indicator {{
-            background-color: {hex_color};
-            border-radius: 50%;
-            border: 1px solid alpha(currentColor, 0.3);
-        }}
-        """
-        css_provider.load_from_data(css.encode("utf-8"))
+        """Apply a color indicator to a box widget."""
+        from .global_rules_delegate import GlobalRulesDelegate
 
-        context = box.get_style_context()
-        if hasattr(box, "_css_provider"):
-            context.remove_provider(box._css_provider)
-
-        context.add_provider(css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        box.add_css_class("rule-color-indicator")
-        box._css_provider = css_provider
+        GlobalRulesDelegate.apply_color_to_box(box, hex_color)
 
     def _on_enable_toggled(self, switch: Adw.SwitchRow, _pspec) -> None:
         """Handle enable toggle."""

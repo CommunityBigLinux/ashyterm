@@ -75,7 +75,7 @@ class InlineContextMenu(Gtk.Box):
         )
 
         self._item_label = Gtk.Label(
-            xalign=0.0,
+           
             hexpand=True,
             ellipsize=3,  # Pango.EllipsizeMode.END
         )
@@ -241,7 +241,6 @@ class InlineContextMenu(Gtk.Box):
         """Add an action button to the menu."""
         button = Gtk.Button()
         button.add_css_class("flat")
-        button.set_halign(Gtk.Align.FILL)
 
         if is_destructive:
             button.add_css_class("destructive-action")
@@ -259,7 +258,7 @@ class InlineContextMenu(Gtk.Box):
         icon.set_icon_size(Gtk.IconSize.NORMAL)
         content_box.append(icon)
 
-        action_label = Gtk.Label(label=label, xalign=0.0, hexpand=True)
+        action_label = Gtk.Label(label=label, hexpand=True)
         content_box.append(action_label)
 
         button.set_child(content_box)

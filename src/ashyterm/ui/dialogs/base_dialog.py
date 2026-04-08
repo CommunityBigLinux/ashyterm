@@ -283,7 +283,7 @@ class BaseDialog(Adw.Window):
         """Show an inline error message below a form field."""
         label = self._field_error_labels.get(id(widget))
         if label is None:
-            label = Gtk.Label(xalign=0, wrap=True)
+            label = Gtk.Label( wrap=True)
             label.add_css_class("error")
             label.add_css_class("caption")
             label.set_margin_start(12)
@@ -500,8 +500,9 @@ class BaseDialog(Adw.Window):
         return group
 
 
-# Re-export create_icon_button from utils.icons for convenience
-from ...utils.icons import create_icon_button  # noqa: E402, F401
+# Re-export create_icon_button — convenience import for dialog modules
+# noqa: E402 — re-export after module body; F401 — re-export for consumers
+from ...utils.icons import create_icon_button  # noqa: E402, F401 — re-export
 
 
 def show_delete_confirmation_dialog(

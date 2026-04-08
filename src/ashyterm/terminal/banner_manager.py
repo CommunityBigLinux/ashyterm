@@ -12,7 +12,6 @@ from gi.repository import Adw, GLib, Gtk, Vte
 
 from ..sessions.models import SessionItem
 from ..utils.logger import get_logger
-from ..utils.translation_utils import _
 
 if TYPE_CHECKING:
     from .tabs import TabManager

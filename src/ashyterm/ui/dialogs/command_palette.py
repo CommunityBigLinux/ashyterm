@@ -145,19 +145,16 @@ class CommandPalette(Adw.Dialog):
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         hbox.set_margin_top(8)
         hbox.set_margin_bottom(8)
-        hbox.set_margin_start(12)
-        hbox.set_margin_end(12)
 
         # Category badge
         cat_label = Gtk.Label(label=category)
         cat_label.add_css_class("dim-label")
         cat_label.add_css_class("caption")
         cat_label.set_size_request(80, -1)
-        cat_label.set_xalign(0)
         hbox.append(cat_label)
 
         # Command name
-        name_label = Gtk.Label(label=label, hexpand=True, xalign=0)
+        name_label = Gtk.Label(label=label, hexpand=True)
         hbox.append(name_label)
 
         # Shortcut keycap (if exists)

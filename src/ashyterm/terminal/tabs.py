@@ -2,7 +2,6 @@
 
 import re
 import threading
-import time
 import weakref
 from typing import TYPE_CHECKING, Callable, List, Optional
 
@@ -60,7 +59,7 @@ def _create_terminal_pane(
     # header_box has .header-bar class, which is targeted by ThemeEngine CSS for transparency
 
     # Title label
-    title_label = Gtk.Label(label=title, ellipsize=Pango.EllipsizeMode.END, xalign=0.0)
+    title_label = Gtk.Label(label=title, ellipsize=Pango.EllipsizeMode.END)
     title_label.set_hexpand(True)
     title_label.set_halign(Gtk.Align.START)
     header_box.append(title_label)
@@ -83,7 +82,6 @@ def _create_terminal_pane(
 
     # Main content (the terminal)
     scrolled_window = Gtk.ScrolledWindow(child=terminal)
-    scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
     scrolled_window.set_vexpand(True)
     scrolled_window.set_hexpand(True)
     toolbar_view.set_content(scrolled_window)
@@ -439,7 +437,6 @@ class TabManager:
         terminal.connect("bell", self._on_terminal_bell)
 
         scrolled_window = Gtk.ScrolledWindow(child=terminal)
-        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
         # Replace ScrolledWindow's built-in EventControllerScroll with our
         # own so we have full control over scrolling (sensitivity + kinetic).

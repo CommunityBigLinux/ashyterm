@@ -6,7 +6,7 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, Gdk, GLib, Gtk
+from gi.repository import Gdk, GLib, Gtk
 
 from ..sessions.models import SessionFolder, SessionItem
 from ..utils.icons import set_button_icon
@@ -275,14 +275,10 @@ class SidebarManager:
             get_tooltip_helper().add_tooltip(self.toggle_sidebar_button, tooltip_text)
 
     def _focus_first_item(self):
-        """Focus on the first item in the session tree for keyboard navigation."""
+        """Focus on the session tree for keyboard navigation."""
         tree_widget = self.session_tree.get_widget()
         if tree_widget:
             tree_widget.grab_focus()
-            # Select the first item if nothing is selected
-            if self.session_tree.selection_model.get_selection().get_size() == 0:
-                if self.session_tree.filter_model.get_n_items() > 0:
-                    self.session_tree.selection_model.select_item(0, True)
         return False
 
     def update_sidebar_sizes(self):

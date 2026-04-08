@@ -64,52 +64,43 @@ class TooltipHelper:
         GLib.idle_add(self._apply_default_colors)
 
     def _apply_default_colors(self):
-        """Apply colors based on current Adwaita theme."""
-        try:
-            style_manager = Adw.StyleManager.get_default()
-            is_dark = style_manager.get_dark()
-            bg_color = "#1a1a1a" if is_dark else "#fafafa"
-            fg_color = "#ffffff" if is_dark else "#2e2e2e"
-        except Exception:
-            bg_color = "#2a2a2a"
-            fg_color = "#ffffff"
-
-        self._apply_css(bg_color, fg_color)
+        """Apply CSS using GTK named colors for theme-aware tooltips."""
+        self._apply_css()
         return GLib.SOURCE_REMOVE
 
     def _ensure_colors_initialized(self):
         """Ensure colors are set up before first tooltip display."""
         if not self._colors_initialized:
-            self._apply_default_colors()
+            self._apply_css()
             self._colors_initialized = True
 
-    def _apply_css(self, bg_color: str, fg_color: str):
-        """Generate and apply CSS for tooltip styling."""
-        tooltip_bg = self._adjust_tooltip_background(bg_color)
-        is_dark_theme = self._is_dark_color(bg_color)
-        border_color = "#707070" if is_dark_theme else "#a0a0a0"
+    def _apply_css(self):
+        """Generate and apply CSS for tooltip styling using GTK named colors.
 
-        css = f"""
-popover.custom-tooltip-static {{
+        Uses GTK4 named colors (@popover_bg_color, @window_fg_color, etc.)
+        so colors adapt automatically to system theme — no hardcoded hex.
+        """
+        css = """
+popover.custom-tooltip-static {
     background: transparent;
     box-shadow: none;
     padding: 12px;
     opacity: 0;
     transition: opacity 200ms ease-in-out;
-}}
-popover.custom-tooltip-static.visible {{
+}
+popover.custom-tooltip-static.visible {
     opacity: 1;
-}}
-popover.custom-tooltip-static > contents {{
-    background-color: {tooltip_bg};
-    color: {fg_color};
+}
+popover.custom-tooltip-static > contents {
+    background-color: @popover_bg_color;
+    color: @window_fg_color;
     padding: 6px 12px;
     border-radius: 6px;
-    border: 1px solid {border_color};
-}}
-popover.custom-tooltip-static label {{
-    color: {fg_color};
-}}
+    border: 1px solid @borders;
+}
+popover.custom-tooltip-static label {
+    color: @window_fg_color;
+}
 """
         display = Gdk.Display.get_default()
         if not display:
@@ -123,46 +114,15 @@ popover.custom-tooltip-static label {{
             except Exception:
                 pass
 
-        provider = Gtk.CssProvider()
-        provider.load_from_data(css.encode("utf-8"))
+        from ..utils.css_helpers import apply_inline_css
+
+        provider = apply_inline_css(
+            css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 100, display,
+        )
         try:
-            Gtk.StyleContext.add_provider_for_display(
-                display, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 100
-            )
             self._color_css_provider = provider
         except Exception:
             logger.exception("Failed to add CSS provider for tooltip colors")
-
-    def _adjust_tooltip_background(self, bg_color: str) -> str:
-        try:
-            hex_val = bg_color.lstrip("#")
-            r, g, b = (
-                int(hex_val[0:2], 16),
-                int(hex_val[2:4], 16),
-                int(hex_val[4:6], 16),
-            )
-            luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-            adj = 40 if luminance < 0.5 else -20
-            r, g, b = (
-                max(0, min(255, r + adj)),
-                max(0, min(255, g + adj)),
-                max(0, min(255, b + adj)),
-            )
-            return f"#{r:02x}{g:02x}{b:02x}"
-        except Exception:
-            return bg_color
-
-    def _is_dark_color(self, color: str) -> bool:
-        try:
-            hex_val = color.lstrip("#")
-            r, g, b = (
-                int(hex_val[0:2], 16),
-                int(hex_val[2:4], 16),
-                int(hex_val[4:6], 16),
-            )
-            return (0.299 * r + 0.587 * g + 0.114 * b) / 255 < 0.5
-        except Exception:
-            return True
 
     def add_tooltip(self, widget: Gtk.Widget, tooltip_text: str) -> None:
         if not tooltip_text:

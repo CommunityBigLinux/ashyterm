@@ -283,7 +283,9 @@ class LoggerManager:
                 if log_file.stat().st_mtime < cutoff_time:
                     log_file.unlink()
         except Exception as e:
-            print(f"Error cleaning up old logs: {e}")
+            logging.getLogger("ashyterm.utils.logger").error(
+                "Error cleaning up old logs: %s", e
+            )
 
 
 _logger_manager = LoggerManager()

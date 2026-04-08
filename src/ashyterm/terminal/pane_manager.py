@@ -102,7 +102,21 @@ class PaneManager:
             return
 
         survivor_terminal = self.get_first_terminal_in_widget(survivor_pane)
-        self._clear_paned_children(parent_paned)
+
+        # Clear grandparent focus ref before reparenting to avoid GTK warnings
+        if hasattr(grandparent, "set_focus_child"):
+            grandparent.set_focus_child(None)
+
+        # Remove only the target pane — survivor remains as sole child
+        if parent_paned.get_start_child() == pane_to_remove:
+            parent_paned.set_start_child(None)
+        elif parent_paned.get_end_child() == pane_to_remove:
+            parent_paned.set_end_child(None)
+
+        # Clear focus on now-single-child paned to avoid stale focus ref
+        parent_paned.set_focus_child(None)
+
+        # Move survivor from parent_paned → grandparent
         self._reparent_survivor(survivor_pane, parent_paned, grandparent)
         self.schedule_focus_restore(survivor_terminal)
 
@@ -182,13 +196,26 @@ class PaneManager:
         )
 
     def _clear_paned_children(self, paned: Gtk.Paned) -> None:
-        """Clear all children from a paned widget."""
-        paned.set_focus_child(None)
-        paned.set_start_child(None)
-        paned.set_end_child(None)
+        """Clear all children from a paned widget.
+
+        Removes children first to avoid GTK focus tracking warnings on empty paneds.
+        """
+        start = paned.get_start_child()
+        end = paned.get_end_child()
+        if start:
+            paned.set_start_child(None)
+        if end:
+            paned.set_end_child(None)
+        if start or end:
+            paned.set_focus_child(None)
 
     def _reparent_survivor(self, survivor_pane, parent_paned, grandparent) -> None:
         """Reparent the surviving pane to the grandparent container."""
+        # Clear stale focus references before reparenting to avoid GTK warnings
+        # about focus widgets no longer being children
+        if hasattr(grandparent, "set_focus_child"):
+            grandparent.set_focus_child(None)
+
         if isinstance(grandparent, Gtk.Paned):
             is_grandparent_start = grandparent.get_start_child() == parent_paned
             if is_grandparent_start:

@@ -1,6 +1,6 @@
-# Use regex module (PCRE2 backend) for ~50% faster matching if available,
-# otherwise fall back to the standard re module.
+# regex (PCRE2) → ~50% faster matching vs stdlib re
+# WHY noqa: conditional import — one must be unused by design
 try:
-    import regex as engine  # noqa: F401
+    import regex as engine  # noqa: F401 — optional dep: regex → re fallback
 except ImportError:
-    import re as engine  # noqa: F401
+    import re as engine  # noqa: F401 — fallback when regex unavailable

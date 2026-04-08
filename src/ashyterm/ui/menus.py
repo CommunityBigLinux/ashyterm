@@ -160,7 +160,7 @@ class MainApplicationMenu:
     def create_main_popover(parent_window) -> tuple[Gtk.Popover, FontSizerWidget]:
         popover = Gtk.Popover()
         popover.add_css_class("ashyterm-popover")
-        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0, hexpand=True)
         main_box.add_css_class("main-menu-popover")
         popover.set_child(main_box)
 
@@ -207,10 +207,11 @@ class MainApplicationMenu:
                     action_name=item["action"],
                     css_classes=["flat", "body"],
                     halign=Gtk.Align.FILL,
+                    hexpand=True,
                 )
-                box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=24)
+                box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=24, hexpand=True)
                 button.set_child(box)
-                action_label = Gtk.Label(label=item["label"], xalign=0.0, hexpand=True)
+                action_label = Gtk.Label(label=item["label"], hexpand=True)
                 box.append(action_label)
                 accels = app.get_accels_for_action(item["action"])
                 if accels:

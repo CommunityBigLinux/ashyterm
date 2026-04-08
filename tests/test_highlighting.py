@@ -93,12 +93,10 @@ class TestColorResolution:
     @pytest.fixture
     def manager(self):
         from ashyterm.settings.highlights import HighlightManager
+        from ashyterm.settings.highlight_colors import HighlightColorResolver
         mgr = HighlightManager.__new__(HighlightManager)
-        # Minimal init without GObject
-        mgr.logger = MagicMock()
-        mgr._settings_manager = None
-        mgr._color_cache = {}
-        mgr._current_theme_name = "default"
+        # Minimal init — _colors handles all color resolution
+        mgr._colors = HighlightColorResolver()
         return mgr
 
     def test_parse_color_spec_simple(self, manager):
@@ -1175,13 +1173,11 @@ class TestEndToEndColorApplication:
     def test_global_rule_error_produces_bold_red_output(self):
         """Global 'error' rule produces bold red ANSI output end-to-end."""
         from ashyterm.settings.highlights import HighlightManager
+        from ashyterm.settings.highlight_colors import HighlightColorResolver
 
         # Create a manager-like object for color resolution
         mgr = HighlightManager.__new__(HighlightManager)
-        mgr.logger = MagicMock()
-        mgr._settings_manager = None
-        mgr._color_cache = {}
-        mgr._current_theme_name = "default"
+        mgr._colors = HighlightColorResolver()
 
         # Resolve "bold red" to ANSI
         ansi_bold_red = mgr.resolve_color_to_ansi("bold red")

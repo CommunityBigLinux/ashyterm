@@ -24,6 +24,7 @@ from .settings.manager import SettingsManager, get_settings_manager
 # from .utils.security import create_security_auditor  # Loaded on first access via property
 from .utils.logger import get_logger
 from .utils.translation_utils import _
+from .cli_parser import CliArgParser
 
 if TYPE_CHECKING:
     from .window import CommTerminalWindow
@@ -47,6 +48,7 @@ class CommTerminalApp(Adw.Application):
         self._platform_info = None  # Lazy loaded via property
         self._initialized = False
         self._shutting_down = False
+        self._arg_parser = CliArgParser(self)
 
         self.connect("startup", self._on_startup)
         self.connect("activate", self._on_activate)
@@ -270,111 +272,15 @@ class CommTerminalApp(Adw.Application):
         """Handle command line arguments for both initial and subsequent launches."""
         arguments = command_line.get_arguments()
         self.logger.info(f"Processing command line: {arguments}")
-        self._process_and_execute_args(arguments)
+        self._arg_parser.process_and_execute_args(arguments)
         # Mark that we've already presented window to avoid duplicate present() in _on_activate
         self._window_already_presented = True
         self.activate()
         return 0
 
-    def _handle_working_directory_arg(
-        self, arg: str, arguments: list, i: int, result: dict
-    ) -> tuple:
-        """Handle working directory argument variants. Returns (consumed, new_index)."""
-        if arg in ["-w", "--working-directory"] and i + 1 < len(arguments):
-            result["working_directory"] = arguments[i + 1]
-            return True, i + 2
-        if arg.startswith("--working-directory="):
-            result["working_directory"] = arg.split("=", 1)[1]
-            return True, i + 1
-        return False, i
-
-    def _handle_ssh_arg(self, arg: str, arguments: list, i: int, result: dict) -> tuple:
-        """Handle SSH argument variants. Returns (consumed, new_index)."""
-        if arg == "--ssh" and i + 1 < len(arguments):
-            result["ssh_target"] = arguments[i + 1]
-            return True, i + 2
-        if arg.startswith("--ssh="):
-            result["ssh_target"] = arg.split("=", 1)[1]
-            return True, i + 1
-        return False, i
-
-    def _handle_execution_arg(
-        self, arg: str, arguments: list, i: int, result: dict
-    ) -> tuple:
-        """Handle execution related arguments. Returns (consumed, new_index, stop_parsing)."""
-        # 1. Stop parsing markers
-        if arg in ["-e", "-x", "--execute"]:
-            return True, i + 1, True
-
-        # 2. Key-value style
-        if arg.startswith("--execute="):
-            result["execute_command"] = arg.split("=", 1)[1]
-            return True, i + 1, False
-
-        # 3. Flags
-        if arg == "--close-after-execute":
-            result["close_after_execute"] = True
-            return True, i + 1, False
-
-        if arg == "--new-window":
-            result["force_new_window"] = True
-            return True, i + 1, False
-
-        return False, i, False
-
-    def _handle_generic_arg(self, arg: str, result: dict, i: int) -> int:
-        """Handle positional arguments or unknown flags."""
-        # Check working directory and SSH handlers first (legacy integration)
-        # These are now merged or called sequentially in the main loop
-
-        # Positional working directory (if not already set)
-        if not arg.startswith("-") and result["working_directory"] is None:
-            result["working_directory"] = arg
-
-        return i + 1
-
-    def _parse_command_line_args(self, arguments: list) -> dict:
-        """Parse command line arguments into a structured dictionary."""
-        result: dict[str, str | bool | None] = {
-            "working_directory": None,
-            "execute_command": None,
-            "ssh_target": None,
-            "close_after_execute": False,
-            "force_new_window": False,
-        }
-
-        i = 1
-        execute_index = None
-        while i < len(arguments):
-            arg = arguments[i]
-
-            # Try specialized handlers
-            consumed, i = self._handle_working_directory_arg(arg, arguments, i, result)
-            if consumed:
-                continue
-
-            consumed, i = self._handle_ssh_arg(arg, arguments, i, result)
-            if consumed:
-                continue
-
-            # Try execution handlers
-            consumed, i, stop = self._handle_execution_arg(arg, arguments, i, result)
-            if stop:
-                execute_index = i
-                break
-            if consumed:
-                continue
-
-            # Handle flags and generic arguments
-            i = self._handle_generic_arg(arg, result, i)
-
-        # Capture remaining arguments as execute command
-        if execute_index is not None and execute_index < len(arguments):
-            remaining = arguments[execute_index:]
-            if remaining:
-                result["execute_command"] = " ".join(remaining)
-
-        return result
+    def _process_and_execute_args(self, arguments: list):
+        """Parse arguments and decide what action to take. Delegated to CliArgParser."""
+        self._arg_parser.process_and_execute_args(arguments)
 
     def _create_tab_in_window(
         self,
@@ -384,79 +290,18 @@ class CommTerminalApp(Adw.Application):
         working_directory,
         close_after_execute,
     ):
-        """Create appropriate tab type in existing window."""
-        if ssh_target:
-            window.create_ssh_tab(ssh_target)
-        elif execute_command:
-            window.create_execute_tab(
-                execute_command, working_directory, close_after_execute
-            )
-        else:
-            window.create_local_tab(working_directory)
-
-    def _process_and_execute_args(self, arguments: list):
-        """Parse arguments and decide what action to take."""
-        args = self._parse_command_line_args(arguments)
-        assert self.settings_manager is not None
-        behavior = self.settings_manager.get("new_instance_behavior", "new_tab")
-        windows = self.get_windows()
-        target_window = windows[0] if windows else None
-
-        has_explicit_command = (
-            args["ssh_target"] or args["execute_command"] or args["working_directory"]
+        """Create appropriate tab type in existing window. Delegated to CliArgParser."""
+        self._arg_parser.create_tab_in_window(
+            window,
+            ssh_target,
+            execute_command,
+            working_directory,
+            close_after_execute,
         )
 
-        if args["force_new_window"] or behavior == "new_window" or not target_window:
-            self.logger.info("Creating a new window for command line arguments.")
-            window = self.create_new_window(
-                initial_working_directory=args["working_directory"],
-                initial_execute_command=args["execute_command"],
-                close_after_execute=args["close_after_execute"],
-                initial_ssh_target=args["ssh_target"],
-            )
-            self._present_window_and_request_focus(window)
-        elif behavior == "focus_existing" and not has_explicit_command:
-            self.logger.info("Focusing existing window without creating new tab.")
-            self._present_window_and_request_focus(target_window)
-        else:
-            self.logger.info("Reusing existing window for a new tab.")
-            self._present_window_and_request_focus(target_window)
-            self._create_tab_in_window(
-                target_window,
-                args["ssh_target"],
-                args["execute_command"],
-                args["working_directory"],
-                args["close_after_execute"],
-            )
-
     def _present_window_and_request_focus(self, window: Gtk.Window):
-        """Present the window and use a modal dialog hack to request focus if needed.
-
-        The hack is deferred to run at low priority, allowing the main window
-        to render and become interactive first. This improves perceived startup time.
-
-        NOTE: This hack is required for KDE Plasma/Wayland to properly focus the window
-        when opening a new tab from an external program.
-        """
-        window.present()
-
-        def check_and_apply_hack():
-            if not window.is_active():
-                self.logger.info(
-                    "Window not active after present(), applying modal window hack."
-                )
-                hack_window = Gtk.Window(transient_for=window, modal=True)
-
-                hack_window.set_default_size(1, 1)
-                hack_window.set_decorated(False)
-
-                hack_window.present()
-                GLib.idle_add(hack_window.destroy)
-
-            return GLib.SOURCE_REMOVE
-
-        # Run at low priority so it doesn't block the initial render
-        GLib.idle_add(check_and_apply_hack, priority=GLib.PRIORITY_LOW)
+        """Present window and request focus. Delegated to CliArgParser."""
+        self._arg_parser.present_window_and_request_focus(window)
 
     def _on_command_line(self, app, command_line):
         return self.do_command_line(command_line)

@@ -1056,7 +1056,7 @@ class TerminalManager(SSHLifecycleMixin, URLHandlerMixin):
         self,
         terminal: Vte.Terminal,
         x: float,
-        y: float,  # noqa: ARG002
+        y: float,  # noqa: ARG002 — callback signature, unused param
     ) -> None:
         # URL context menu updates are handled elsewhere
         pass

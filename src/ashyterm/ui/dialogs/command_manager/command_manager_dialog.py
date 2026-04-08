@@ -700,7 +700,7 @@ class CommandManagerDialog(Adw.Window):
 
         info_label = Gtk.Label(
             label=_("Click on a command to restore it:"),
-            xalign=0.0,
+           
             css_classes=[BaseDialog.CSS_CLASS_DIM_LABEL],
         )
         content_box.append(info_label)

@@ -224,7 +224,7 @@ class CommandFormDialog(Adw.Window):
 
         preview_title = Gtk.Label(
             label=_("Command Preview"),
-            xalign=0.0,
+           
             css_classes=[BaseDialog.CSS_CLASS_DIM_LABEL, "caption"],
         )
         preview_container.append(preview_title)
@@ -240,7 +240,7 @@ class CommandFormDialog(Adw.Window):
             use_markup=True,
             wrap=True,
             wrap_mode=Pango.WrapMode.CHAR,
-            xalign=0.0,
+           
             hexpand=True,
             selectable=False,  # Don't select on start
             css_classes=["monospace"],
@@ -260,7 +260,7 @@ class CommandFormDialog(Adw.Window):
                 label=self.command.description,
                 wrap=True,
                 wrap_mode=Pango.WrapMode.WORD_CHAR,
-                xalign=0.0,
+               
                 css_classes=[BaseDialog.CSS_CLASS_DIM_LABEL],
             )
             content_box.append(desc_label)

@@ -173,7 +173,6 @@ class AIConfigDialog(Adw.PreferencesWindow):
     def _update_ui_for_provider(self, provider_id: str) -> None:
         """Update UI elements based on the selected provider."""
         is_local = provider_id == "local"
-        is_openrouter = provider_id == "openrouter"
 
         # Show/hide base URL for local provider
         self.base_url_row.set_visible(is_local)
@@ -665,7 +664,7 @@ class ModelBrowserDialog(Adw.Window):
         name_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
         name_label = Gtk.Label(
             label=model_name,
-            xalign=0,
+            
             css_classes=["heading"],
             wrap=True,
             wrap_mode=2,  # WORD_CHAR
@@ -690,7 +689,7 @@ class ModelBrowserDialog(Adw.Window):
         # Model ID (smaller, dim)
         id_label = Gtk.Label(
             label=model_id,
-            xalign=0,
+            
             css_classes=["dim-label", "caption"],
             selectable=True,
         )

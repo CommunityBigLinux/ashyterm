@@ -156,7 +156,6 @@ class AIChatPanel(Gtk.Box):
 
         prompts_title = Gtk.Label(label=_("Quick Prompts"))
         prompts_title.add_css_class("dim-label")
-        prompts_title.set_xalign(0)
         prompts_title.set_hexpand(True)
         prompts_header.append(prompts_title)
 
@@ -398,7 +397,7 @@ class AIChatPanel(Gtk.Box):
         fg = scheme.get("foreground", "#ffffff" if is_dark else "#000000")
         header_bg = scheme.get("headerbar_background", base)
         palette = scheme.get("palette", [])
-        accent = palette[4] if len(palette) > 4 else "#3584e4"
+        accent = palette[4] if len(palette) > 4 else "@accent_bg_color"
 
         r, g, b = int(base[1:3], 16), int(base[3:5], 16), int(base[5:7], 16)
         if transparency > 0:
@@ -414,7 +413,7 @@ class AIChatPanel(Gtk.Box):
             "rgba_bg": rgba_bg,
             "content_fg": fg,
             "bubble_user_bg": accent,
-            "bubble_user_fg": "#ffffff" if lum < 0.5 else "#000000",
+            "bubble_user_fg": "@view_fg_color" if lum < 0.5 else "@view_fg_color",
             "bubble_assistant_bg": header_bg,
             "bubble_assistant_border": f"color-mix(in srgb, {fg} 10%, transparent)",
             "input_bg": header_bg,
@@ -425,28 +424,28 @@ class AIChatPanel(Gtk.Box):
         }
 
     def _adwaita_theme_colors(self, is_dark: bool) -> dict:
-        """Colors for standard Adwaita light/dark themes."""
+        """Colors for standard Adwaita light/dark themes using GTK named colors."""
         if is_dark:
             return {
-                "rgba_bg": "rgb(30, 30, 30)",
-                "content_fg": "var(--window-fg-color, #ffffff)",
-                "bubble_user_bg": "var(--accent-color, #3584e4)",
-                "bubble_user_fg": "#ffffff",
-                "bubble_assistant_bg": "#2d2d2d",
-                "bubble_assistant_border": "rgba(255, 255, 255, 0.1)",
-                "input_bg": "#2d2d2d",
-                "input_border": "rgba(255, 255, 255, 0.1)",
+                "rgba_bg": "@window_bg_color",
+                "content_fg": "@window_fg_color",
+                "bubble_user_bg": "@accent_bg_color",
+                "bubble_user_fg": "@accent_fg_color",
+                "bubble_assistant_bg": "@popover_bg_color",
+                "bubble_assistant_border": "@borders",
+                "input_bg": "@popover_bg_color",
+                "input_border": "@borders",
                 "scroll_bg": "transparent",
             }
         return {
-            "rgba_bg": "rgb(246, 245, 244)",
-            "content_fg": "var(--window-fg-color, #000000)",
-            "bubble_user_bg": "var(--accent-color, #3584e4)",
-            "bubble_user_fg": "#ffffff",
-            "bubble_assistant_bg": "#ffffff",
-            "bubble_assistant_border": "rgba(0, 0, 0, 0.08)",
-            "input_bg": "#ffffff",
-            "input_border": "rgba(0, 0, 0, 0.12)",
+            "rgba_bg": "@window_bg_color",
+            "content_fg": "@window_fg_color",
+            "bubble_user_bg": "@accent_bg_color",
+            "bubble_user_fg": "@accent_fg_color",
+            "bubble_assistant_bg": "@popover_bg_color",
+            "bubble_assistant_border": "@borders",
+            "input_bg": "@popover_bg_color",
+            "input_border": "@borders",
             "scroll_bg": "transparent",
         }
 
@@ -482,20 +481,20 @@ class AIChatPanel(Gtk.Box):
                 background-color: rgba(255, 60, 60, 0.1);
             }}
             .ai-command-block {{
-                background-color: #1e1e1e;
-                color: #e0e0e0;
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background-color: @popover_bg_color;
+                color: @window_fg_color;
+                border: 1px solid @borders;
                 border-radius: 10px;
                 padding: 12px 14px;
                 transition: all 200ms ease;
             }}
             .ai-command-block:hover {{
-                background-color: #2d2d2d;
+                background-color: @card_bg_color;
                 border-color: alpha(@accent_color, 0.4);
                 box-shadow: 0 2px 8px alpha(@accent_color, 0.1);
             }}
             .ai-command-text {{
-                color: #e0e0e0;
+                color: @window_fg_color;
             }}
             .ai-input-box {{
                 background-color: {c["input_bg"]};
@@ -747,9 +746,6 @@ class AIChatPanel(Gtk.Box):
 
         # Error icon and message
         error_content = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        error_content.set_margin_start(8)
-        error_content.set_margin_end(8)
-        error_content.set_margin_top(8)
 
         error_icon = Gtk.Image.new_from_icon_name("dialog-warning-symbolic")
         error_icon.add_css_class("warning")
@@ -758,7 +754,6 @@ class AIChatPanel(Gtk.Box):
         error_label = Gtk.Label()
         error_label.set_wrap(True)
         error_label.set_wrap_mode(Pango.WrapMode.WORD_CHAR)
-        error_label.set_xalign(0)
         error_label.set_hexpand(True)
         error_label.set_selectable(True)
         error_label.set_markup(self._linkify_error(error_msg))

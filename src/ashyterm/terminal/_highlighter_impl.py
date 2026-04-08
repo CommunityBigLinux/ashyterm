@@ -46,7 +46,7 @@ from .highlighter.constants import (
 )
 
 if TYPE_CHECKING:
-    from ..sessions.models import SessionItem  # noqa: F401
+    from ..sessions.models import SessionItem  # noqa: F401 — type hint only import
 
 # Import OutputHighlighter from its own module
 from .highlighter.output import OutputHighlighter, get_output_highlighter

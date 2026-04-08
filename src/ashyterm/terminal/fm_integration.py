@@ -5,9 +5,9 @@ Handles toggling, positioning, and lifecycle of the file manager
 pane within terminal tabs.
 """
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from gi.repository import Adw, Gtk, Vte
+from gi.repository import Adw, Gtk
 
 from ..utils.logger import get_logger
 

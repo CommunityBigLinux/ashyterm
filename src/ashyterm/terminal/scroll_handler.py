@@ -6,7 +6,6 @@ Ctrl+scroll font zoom, and smart scroll-on-output.
 """
 
 import time
-import weakref
 from typing import TYPE_CHECKING
 
 from gi.repository import Gdk, GLib, Gtk, Vte

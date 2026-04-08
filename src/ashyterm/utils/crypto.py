@@ -26,14 +26,12 @@ from gi.repository import Gio
 
 
 def is_encryption_available() -> bool:
-    """Checks if the libsecret library is available."""
+    """Check libsecret availability."""
     return _SECRET_AVAILABLE
 
 
 def store_password(session_name: str, password: str) -> bool:
-    """
-    Stores a password securely in the system keyring (GNOME Keyring, KWallet).
-    """
+    """Store password → system keyring (GNOME Keyring / KWallet)."""
     if not is_encryption_available():
         raise AshyTerminalError("Secret Service API is not available.")
 
@@ -58,9 +56,7 @@ def store_password(session_name: str, password: str) -> bool:
 
 
 def lookup_password(session_name: str) -> Optional[str]:
-    """
-    Looks up a password from the system keyring.
-    """
+    """Lookup password from system keyring."""
     if not is_encryption_available():
         raise AshyTerminalError("Secret Service API is not available.")
 
@@ -81,9 +77,7 @@ def lookup_password(session_name: str) -> Optional[str]:
 
 
 def clear_password(session_name: str) -> bool:
-    """
-    Removes a password from the system keyring.
-    """
+    """Remove password from system keyring."""
     if not is_encryption_available():
         return False
 
@@ -99,14 +93,13 @@ def clear_password(session_name: str) -> bool:
 
 
 def export_all_passwords(sessions_store: Gio.ListStore) -> Dict[str, str]:
-    """
-    Exports all passwords from the keyring for sessions that use them.
+    """Export all keyring passwords → dict{name: password}.
 
     Args:
-        sessions_store: The Gio.ListStore containing all SessionItem objects.
+        sessions_store: Gio.ListStore w/ SessionItem objects
 
     Returns:
-        A dictionary mapping session names to their passwords.
+        dict mapping session name → password
     """
     # Import moved inside the function to break the circular dependency
     from ..sessions.models import SessionItem

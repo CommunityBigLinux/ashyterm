@@ -389,7 +389,7 @@ class CommandEditorDialog(Adw.Window):
 
         help_label = Gtk.Label(
             label=_("Enter the bash command to execute:"),
-            xalign=0.0,
+           
             css_classes=[BaseDialog.CSS_CLASS_DIM_LABEL, "caption"],
             margin_start=4,
         )
@@ -497,7 +497,7 @@ class CommandEditorDialog(Adw.Window):
         parts_header.append(
             Gtk.Label(
                 label=_("Add command parts"),
-                xalign=0.0,
+               
                 hexpand=True,
                 css_classes=["title-4"],
             )
@@ -578,7 +578,7 @@ class CommandEditorDialog(Adw.Window):
         preview_group = Adw.PreferencesGroup(title=_("Command Preview"))
 
         self.result_preview = Gtk.Label(
-            xalign=0.0,
+           
             selectable=True,
             wrap=True,
             css_classes=["monospace", "heading"],

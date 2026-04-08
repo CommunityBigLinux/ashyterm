@@ -376,7 +376,7 @@ class FileTransferMixin:
         scrolled_window.set_child(list_box)
 
         for path in local_paths:
-            list_box.append(Gtk.Label(label=path.name, xalign=0.0))
+            list_box.append(Gtk.Label(label=path.name))
 
         dialog.set_extra_child(scrolled_window)
         dialog.add_response("cancel", _("Cancel"))
@@ -627,7 +627,7 @@ class FileTransferMixin:
             path=str(dest_path),
         )
         dialog.set_extra_child(
-            Gtk.Label(label=details, use_markup=True, wrap=True, xalign=0)
+            Gtk.Label(label=details, use_markup=True, wrap=True)
         )
         dialog.add_response("ok", _("OK"))
         dialog.present(self.parent_window)

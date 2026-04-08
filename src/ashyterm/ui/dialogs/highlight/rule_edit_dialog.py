@@ -98,10 +98,6 @@ class RuleEditDialog(BaseDialog):
         self.add_header_button(self._save_btn, pack_start=False)
 
         content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
-        content_box.set_margin_start(24)
-        content_box.set_margin_end(24)
-        content_box.set_margin_top(24)
-        content_box.set_margin_bottom(24)
         self.set_body_content(content_box)
 
         # Name entry
@@ -153,7 +149,6 @@ class RuleEditDialog(BaseDialog):
 
         # Validation status
         self._validation_label = Gtk.Label()
-        self._validation_label.set_xalign(0)
         self._validation_label.add_css_class("dim-label")
         self._validation_label.set_wrap(True)
         content_box.append(self._validation_label)
@@ -313,10 +308,6 @@ class RuleEditDialog(BaseDialog):
         toolbar_view.set_content(scrolled)
 
         content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        content.set_margin_start(24)
-        content.set_margin_end(24)
-        content.set_margin_top(24)
-        content.set_margin_bottom(24)
         scrolled.set_child(content)
 
         def add_group(title, items, subtitle_lines=1):

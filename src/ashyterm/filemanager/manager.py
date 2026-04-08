@@ -9,14 +9,13 @@ import shlex
 import tempfile
 import threading
 import weakref
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 from urllib.parse import unquote, urlparse
 
-from gi.repository import Adw, Gdk, Gio, GLib, GObject, Graphene, Gtk, Vte
+from gi.repository import Adw, Gdk, Gio, GLib, GObject, Gtk, Vte
 
 from ..core.tasks import AsyncTaskManager
-from ..helpers import create_themed_popover_menu
 from ..sessions.models import SessionItem
 from ..terminal.manager import TerminalManager as TerminalManagerType
 from ..utils.icons import icon_button, icon_image
